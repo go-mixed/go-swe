@@ -5,18 +5,12 @@ import (
 	"math"
 )
 
-// 星星的 升/降 角度
+// 天体的 升/降 角度
 type TwilightAngle struct {
 	// 升天, 降天
-	Rise, Set,
+	RiseSet,
 	// 上中天，下中天
 	Noon, Midnight float64
-}
-
-// 星星的 晨/暮 角度
-type DawnDuskAngle struct {
-	// 晨光 暮光
-	Dawn, Dusk float64
 }
 
 /**
@@ -44,13 +38,11 @@ type DawnDuskAngle struct {
  */
 type SunTwilightAngle struct {
 	TwilightAngle
-	// 各个专业领域的角度
-	Astronomical DawnDuskAngle
-	Nautical DawnDuskAngle
-	Civil DawnDuskAngle
+	// 各个专业领域的晨/暮角度
+	Astronomical, Nautical, Civil float64
 }
 
-// 星星的 升/降 时间
+// 天体的 升/降 时间
 type TwilightTime struct {
 	// 升天, 降天
 	Rise, Set JulianDay
@@ -58,10 +50,12 @@ type TwilightTime struct {
 	Noon, Midnight JulianDay
 }
 
-// 星星的 晨/暮 时间
+// 天体的 晨/暮 时间
 type DawnDuskTime struct {
-	// 晨光 暮光
-	Dawn, Dusk JulianDay
+	// 晨
+	Dawn JulianDay
+	// 暮
+	Dusk JulianDay
 }
 
 // 太阳的 升/降/晨/暮 时间
@@ -69,30 +63,20 @@ type SunTwilightTime struct {
 	TwilightTime
 
 	Astronomical DawnDuskTime
-	Nautical DawnDuskTime
-	Civil DawnDuskTime
+	Nautical     DawnDuskTime
+	Civil        DawnDuskTime
 }
 
 func NewSunTwilightAngle() *SunTwilightAngle {
 	return &SunTwilightAngle{
 		TwilightAngle: TwilightAngle{
-			Rise: ToRadian(-50. / 60.), // 地平线以下 50′
-			Set:  ToRadian(-50. / 60.),
-			Noon: ToRadian(90.),
+			RiseSet:  ToRadian(-50. / 60.), // 地平线以下 50′
+			Noon:     ToRadian(90.),
 			Midnight: ToRadian(-90.),
 		},
-		Astronomical:  DawnDuskAngle{
-			Dawn: ToRadian(-18.),
-			Dusk: ToRadian(-18.),
-		},
-		Nautical:      DawnDuskAngle{
-			Dawn: ToRadian(-12.),
-			Dusk: ToRadian(-12.),
-		},
-		Civil:         DawnDuskAngle{
-			Dawn: ToRadian(-6.),
-			Dusk: ToRadian(-6.),
-		},
+		Astronomical: ToRadian(-18.),
+		Nautical:     ToRadian(-12.),
+		Civil:        ToRadian(-6.),
 	}
 }
 
@@ -100,106 +84,97 @@ func NewSunTwilightAngle() *SunTwilightAngle {
  * 日照时长
  * 日落 - 升日
  */
-func (stt *SunTwilightTime) Daylight() JulianDayDelta  {
-	return JulianDayDelta(stt.Set - stt.Rise)
+func (stt *SunTwilightTime) Daylight() float64 {
+	return float64(stt.Set - stt.Rise)
 }
 
 /**
  * 夜晚时长，因为跨午夜，所以取今日00:00 ~ 23:59的时段
  * (0:00 ~ 天文晨光) + (天文暮光 ~ 23:59)
  */
-func (stt *SunTwilightTime) Night() JulianDayDelta {
-	return JulianDayDelta(
+func (stt *SunTwilightTime) Night() float64 {
+	return float64(
 		stt.Astronomical.Dawn - stt.Astronomical.Dawn.Midnight() +
 			(stt.Astronomical.Dusk.AddDays(1).Midnight() - stt.Astronomical.Dusk),
-		)
+	)
 }
 
 /**
  * 太阳
- * 传入本地12点的JdUT(需要是ut),经度(东为负),纬度(南为负)
+ * 传入本地12点的JdUT(比如东八区需要4点: TimeToJulianDay(2020-09-30 04:00:00))，地理坐标
+ * withRevise: 是否修正一些日光差，或者黄道章动
  */
-func SunTwilight(noonJdUT JulianDay, geo *GeographicCoordinates, withRevise bool) *SunTwilightTime  {
+func SunTwilight(jdUT JulianDay, geo *GeographicCoordinates, withRevise bool) *SunTwilightTime {
+
+	// 查找最靠近当日中午的日上中天, mod2的第1参数为本地时角近似值
+	noonJdUT := jdUT.Add(-Mod2(float64(jdUT)+geo.Longitude/Radian360, 1))
+
 	angle := NewSunTwilightAngle()
-	time := &SunTwilightTime{
-		TwilightTime: TwilightTime{
-			Rise:     noonJdUT,
-			Set:      noonJdUT,
-			Noon:     noonJdUT,
-			Midnight: noonJdUT,
-		},
-		Astronomical: DawnDuskTime{
-			Dawn: noonJdUT,
-			Dusk: noonJdUT,
-		},
-		Nautical:     DawnDuskTime{
-			Dawn: noonJdUT,
-			Dusk: noonJdUT,
-		},
-		Civil:        DawnDuskTime{
-			Dawn: noonJdUT,
-			Dusk: noonJdUT,
-		},
+	sunTime := &SunTwilightTime{}
+
+	astro := NewAstronomy(geo, noonJdUT)
+
+	// 天体属性
+	planet, err := astro.PlanetProperties(swe.Sun, withRevise)
+
+	if err != nil {
+		return nil
 	}
 
-	astro := NewAstronomy(geo.Longitude, geo.Latitude, noonJdUT)
+	type haCallback func(hourAngle HourAngle) HourAngle
+	var negativeCallback = func(hourAngle HourAngle) HourAngle {
+		return -hourAngle
+	}
+	var positiveCallback = func(hourAngle HourAngle) HourAngle {
+		return hourAngle
+	}
+	var zeroCallback = func(hourAngle HourAngle) HourAngle {
+		return 0
+	}
+	var piCallback = func(hourAngle HourAngle) HourAngle {
+		return HourAngle(Radian180)
+	}
 
-	var calcHa = func(withRevise bool) (res map[string]float64) {
-		// 时角，星星属性，赤道坐标，错误
-		ha, planet, equator, err := astro.PlanetHourAngle(swe.Sun, withRevise)
+	var revise = func(planet *PlanetProperties, jd JulianDay, angle float64, callback haCallback) (_jd JulianDay) {
+		_jd = jd
+		var ha, _ha HourAngle
 
-		if err != nil {
-			return nil
+		// 计算第一次
+		if math.Abs(angle) < Radian90 {
+			ha = AltitudeToHourAngle(planet.Equatorial.Declination, geo.Latitude, angle)
 		}
+		ha = callback(ha)
 
-		haRise := EquatorToHourAngle(equator.Latitude, geo.Latitude, angle.Rise)
-		haSet := EquatorToHourAngle(equator.Latitude, geo.Latitude, angle.Set)
-		haNoon := EquatorToHourAngle(equator.Latitude, geo.Latitude, angle.Noon)
-		haMidnight := EquatorToHourAngle(equator.Latitude, geo.Latitude, angle.Midnight)
-		haAstronomicalDawn  := EquatorToHourAngle(equator.Latitude, geo.Latitude, angle.Astronomical.Dawn)
-		haAstronomicalDusk  := EquatorToHourAngle(equator.Latitude, geo.Latitude, angle.Astronomical.Dusk)
-		haNauticalDawn  := EquatorToHourAngle(equator.Latitude, geo.Latitude, angle.Nautical.Dawn)
-		haNauticalDusk  := EquatorToHourAngle(equator.Latitude, geo.Latitude, angle.Nautical.Dusk)
-		haCivilDawn  := EquatorToHourAngle(equator.Latitude, geo.Latitude, angle.Civil.Dawn)
-		haCivilDusk  := EquatorToHourAngle(equator.Latitude, geo.Latitude, angle.Civil.Dusk)
+		_jd = _jd.Add(float64(ha-planet.HourAngle) / Radian360)
 
-		if withRevise {
-			// 方位角(地平经度)
-			azimuth :=  Radian90 - ha
-			// 高度角(地平纬度)
-			altitude := equator.Latitude
-
-			coord := EclipticEquatorConventor(&Coordinates{
-				Longitude: azimuth,
-				Latitude:  altitude,
-			}, Radian90 - geo.Latitude)
-
-			azimuth = coord.Longitude
-			altitude = coord.Latitude
-
-			azimuth = RadianMod(Radian90 - azimuth)
-
-			ha = azimuth
-			haRise = altitude
-
-			if haRise > 0 {
-				// 修正大气折射
-				haRise += AstronomicalRefraction2(haRise)
+		// 多修正几次
+		for i := 0; i < 3; i++ {
+			_planet, _err := NewAstronomy(geo, _jd).PlanetProperties(swe.Sun, withRevise)
+			if _err != nil {
+				return
 			}
 
-			// 直接在地平坐标中视差修正(这里把地球看为球形，精度比 Parallax 秒差一些)
-			haRise -= 8.794 / DegreeSecondsPerRadian / planet.Distance * math.Cos(haRise)
+			if math.Abs(angle) < Radian90 {
+				_ha = AltitudeToHourAngle(_planet.Equatorial.Declination, geo.Latitude, angle)
+			}
+			_ha = callback(_ha)
 
-
+			_jd = _jd.Add(RadianMod180(float64(_ha-_planet.HourAngle)) / Radian360)
 		}
 
-		res = map[string]float64{}
-
-		res["ha"] = ha
+		return
 	}
 
+	sunTime.Rise = revise(planet, noonJdUT, angle.RiseSet, negativeCallback)
+	sunTime.Set = revise(planet, noonJdUT, angle.RiseSet, positiveCallback)
+	sunTime.Civil.Dawn = revise(planet, noonJdUT, angle.Civil, negativeCallback)
+	sunTime.Civil.Dusk = revise(planet, noonJdUT, angle.Civil, positiveCallback)
+	sunTime.Nautical.Dawn = revise(planet, noonJdUT, angle.Nautical, negativeCallback)
+	sunTime.Nautical.Dusk = revise(planet, noonJdUT, angle.Nautical, positiveCallback)
+	sunTime.Astronomical.Dawn = revise(planet, noonJdUT, angle.Astronomical, negativeCallback)
+	sunTime.Astronomical.Dusk = revise(planet, noonJdUT, angle.Astronomical, positiveCallback)
+	sunTime.Noon = revise(planet, noonJdUT, angle.Noon, zeroCallback)
+	sunTime.Midnight = revise(planet, noonJdUT, angle.Midnight, piCallback)
 
-
-
-
+	return sunTime
 }
