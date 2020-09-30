@@ -11,7 +11,7 @@ type JulianDay float64
 const JD2000 JulianDay = 2451545.
 
 // time 转为 儒略日 JulianDay
-// 如果需要UT的儒略日，需要传递_time.UTC()
+// 如果需要UT的儒略，需自行转换，如：_time.UTC()
 func TimeToJulianDay(_time time.Time) JulianDay {
 	_hour := float64(_time.Hour()) + float64(_time.Minute())/60. + float64(_time.Second()+_time.Nanosecond()/1e9)/3600.
 	jd, _ := swe.NewSwe().JulDay(_time.Year(), int(_time.Month()), _time.Day(), _hour, swe.Gregorian)
@@ -66,6 +66,11 @@ func (jd JulianDay) ToEphemerisTime(deltaT float64) JulianDay {
 // Ephemeris time 转 JD
 func (jd JulianDay) FromEphemerisTime(deltaT float64) JulianDay {
 	return jd.Add(-deltaT)
+}
+
+// 转换为JD2000的表示方式
+func (jd JulianDay) AsJD2000() JulianDay {
+	return jd - JD2000
 }
 
 // 增加日期，float64 的生成规则和儒略日一致
@@ -167,7 +172,7 @@ func (jd JulianDay) EndOfYear() JulianDay {
 // 格林尼治平恒星时(不含赤经章动及非多项式部分),即格林尼治子午圈的平春分点起算的赤经
 func GreenwichMeridianSiderealTime(jdUT JulianDay, deltaT float64) float64 {
 	//t是力学时(世纪数)
-	t := float64(jdUT.ToEphemerisTime(deltaT)-JD2000) / 36525.
+	t := float64(jdUT.ToEphemerisTime(deltaT).AsJD2000()) / 36525.
 	t2 := t * t
 	t3 := t2 * t
 	t4 := t3 * t
@@ -239,6 +244,6 @@ func dtCalc(y float64) float64 {
  * 计算UT 和 ET 的 DeltaT
  */
 func DeltaT(jdUT JulianDay) float64 {
-	t := jdUT - JD2000
-	return dtCalc(float64(t)/365.2425+2000) / 86400.0
+	jd := jdUT.AsJD2000()
+	return dtCalc(float64(jd)/365.2425+2000) / 86400.0
 }

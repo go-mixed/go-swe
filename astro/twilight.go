@@ -224,7 +224,7 @@ func PlanetTwilight(jdUT JulianDay, geo *GeographicCoordinates, planetId swe.Pla
 func SunTwilight(jdUT JulianDay, geo *GeographicCoordinates, withRevise bool) *SunTwilightTimes {
 
 	// 查找最靠近当日中午的日上中天, mod2的第1参数为本地时角近似值
-	noonJdUT := jdUT.Add(-Mod2(float64(jdUT-JD2000)+geo.Longitude/Radian360, 1))
+	noonJdUT := jdUT.Add(-Mod2(float64(jdUT.AsJD2000())+geo.Longitude/Radian360, 1))
 
 	angle := NewSunTwilightAngle()
 	sunTimes := &SunTwilightTimes{}
@@ -266,7 +266,7 @@ func MoonTwilight(jdUT JulianDay, geo *GeographicCoordinates, withRevise bool) *
 
 	astro := NewAstronomy(geo, jdUT)
 	// 查找最靠近当日中午的月上中天, mod2的第1参数为本地时角近似值
-	moonJdUT := jdUT.Add(-Mod2(0.1726222+0.966136808032357*float64(jdUT-JD2000)-0.0366*astro.DeltaT+geo.Longitude/Radian360, 1))
+	moonJdUT := jdUT.Add(-Mod2(0.1726222+0.966136808032357*float64(jdUT.AsJD2000())-0.0366*astro.DeltaT+geo.Longitude/Radian360, 1))
 	astro.Update(geo, moonJdUT)
 
 	// 天体属性

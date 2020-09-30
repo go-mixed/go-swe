@@ -17,10 +17,10 @@ const Radian180 float64 = math.Pi
 const Radian360 float64 = math.Pi * 2
 
 const (
-	DegreesString = '\u00B0'
-	MinutesString = '\''
-	SecondsString = '"'
-	PointString   = '.'
+	DegreesRune = '\u00B0'
+	MinutesRune = '\''
+	SecondsRune = '"'
+	PointRune   = '.'
 )
 
 // ToDegrees 弧度转换为角度
@@ -64,7 +64,7 @@ func DegreesToString(d float64) string {
 	min = int(math.Mod(absDegree*60, 60))
 	sec = math.Mod(absDegree*3600, 60)
 
-	return fmt.Sprintf("%d%c%d%c%.4f%c", deg, DegreesString, min, MinutesString, sec, SecondsString)
+	return fmt.Sprintf("%d%c%d%c%.4f%c", deg, DegreesRune, min, MinutesRune, sec, SecondsRune)
 }
 
 // ParseDMS parses a coordinate in degrees, minutes, seconds.
@@ -79,11 +79,11 @@ func StringToDegrees(s string) (float64, error) {
 	var tmpBytes []byte
 	var err error
 
-	s = strings.ReplaceAll(s, "′", string(MinutesString))
-	s = strings.ReplaceAll(s, "″", string(SecondsString))
+	s = strings.ReplaceAll(s, "′", string(MinutesRune))
+	s = strings.ReplaceAll(s, "″", string(SecondsRune))
 
 	for i, r := range s {
-		if unicode.IsNumber(r) || r == PointString {
+		if unicode.IsNumber(r) || r == PointRune {
 			if !endNumber {
 				tmpBytes = append(tmpBytes, s[i])
 			} else {
@@ -91,19 +91,19 @@ func StringToDegrees(s string) (float64, error) {
 			}
 		} else if unicode.IsSpace(r) && len(tmpBytes) > 0 {
 			endNumber = true
-		} else if r == DegreesString {
+		} else if r == DegreesRune {
 			if degrees, err = strconv.Atoi(string(tmpBytes)); err != nil {
 				return 0, errors.New("parse error (degrees)")
 			}
 			tmpBytes = tmpBytes[:0]
 			endNumber = false
-		} else if s[i] == MinutesString {
+		} else if s[i] == MinutesRune {
 			if minutes, err = strconv.Atoi(string(tmpBytes)); err != nil {
 				return 0, errors.New("parse error (minutes)")
 			}
 			tmpBytes = tmpBytes[:0]
 			endNumber = false
-		} else if s[i] == SecondsString {
+		} else if s[i] == SecondsRune {
 			if seconds, err = strconv.ParseFloat(string(tmpBytes), 64); err != nil {
 				return 0, errors.New("parse error (seconds)")
 			}

@@ -69,7 +69,6 @@ const (
 	AstOffset = 10000
 )
 
-
 const (
 	_Planet_name_0 = "SunMoonMercuryVenusMarsJupiterSaturnUranusNeptunePlutoMeanNodeTrueNodeMeanApogeeOscuApogeeEarthChironPholusCeresPallasJunoVestaInterApogeeInterPerigee"
 	_Planet_name_1 = "CupidoHadesZeusKronosApollonAdmetosVulkanusPoseidonIsisNibiruHarringtonNeptuneLeverrierNeptuneAdamsPlutoLowellPlutoPickeringVulcanWhiteMoonProserpinaWaldemath"
@@ -149,7 +148,6 @@ const (
 	FlagJPLHorApprox = 1 << 19
 	FlagEphDefault   = FlagEphSwiss
 )
-
 
 // Ayanamsa is the type of sidereal mode constants.
 type Ayanamsa int32
@@ -349,11 +347,11 @@ func NewHSys(c byte) (hsys HSys, ok bool) {
 	}
 
 	switch c {
-		case 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O',
+	case 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O',
 		'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y':
-			return HSys(c), true
-		default:
-			return 0, false
+		return HSys(c), true
+	default:
+		return 0, false
 	}
 }
 
