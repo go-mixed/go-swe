@@ -84,7 +84,7 @@ type BaseInterface interface {
 	// 通过星历表精确的计算ET - UT
 	DeltaTEx(jd float64, eph Ephemeris) (float64, error)
 	// 粗略的计算ET - UT
-	DeltaT(jd float64) (float64)
+	DeltaT(jd float64) float64
 
 	// TimeEqu returns the difference between local apparent and local mean time
 	// in days for the given Julian Date (in Universal Time).
@@ -99,9 +99,11 @@ type BaseInterface interface {
 	// SidTime0 returns the sidereal time for Julian Date jd, ecliptic obliquity
 	// eps and nutation nut at the Greenwich medidian, measured in hours.
 	SidTime0(ut, eps, nut float64, fl *SidTimeFlags) (float64, error)
+	//SidTime0(ut, eps, nut float64) float64
 	// SidTime returns the sidereal time for Julian Date jd at the Greenwich
 	// medidian, measured in hours.
 	SidTime(ut float64, fl *SidTimeFlags) (float64, error)
+	//SidTime(ut float64) float64
 }
 
 // SweInterface extends the main library interface by exposing C library
@@ -432,6 +434,11 @@ func setSidTimeDeltaT(fl *SidTimeFlags) {
 	}
 }
 
+/**
+ * ut: Julian day number, UT
+ * eps: obliquity of ecliptic, in degrees 黄道的倾角
+ * nut: nutation in longitude, in degrees 黄经的章动
+ */
 func (s *swe) SidTime0(ut, eps, nut float64, stf *SidTimeFlags) (float64, error) {
 	s.acquire()
 	setSidTimeDeltaT(stf)
@@ -440,6 +447,9 @@ func (s *swe) SidTime0(ut, eps, nut float64, stf *SidTimeFlags) (float64, error)
 	return f, nil
 }
 
+/**
+ * ut: Julian day number, UT
+ */
 func (s *swe) SidTime(ut float64, stf *SidTimeFlags) (float64, error) {
 	s.acquire()
 	setSidTimeDeltaT(stf)
@@ -447,3 +457,12 @@ func (s *swe) SidTime(ut float64, stf *SidTimeFlags) (float64, error) {
 	s.release()
 	return f, nil
 }
+
+//
+//func (s *swe) SidTime0(ut, eps, nut float64) float64 {
+//	return sidTime0(ut, eps, nut)
+//}
+//
+//func (s *swe) SidTime(ut float64) float64 {
+//	return sidTime(ut)
+//}

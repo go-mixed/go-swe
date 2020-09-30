@@ -7,11 +7,18 @@ import (
 )
 
 func main() {
-	//s := swe.NewSwe()
 
-	fmt.Printf("%v %d \n ", time.Now(), time.Now().Nanosecond())
+	//for i := 1990; i < 2010; i++ {
+	//	t := time.Date(i, 1, 1, 4, 0, 0, 0, time.UTC)
+	//	jd := astro.TimeToJulianDay(t)
+	//	deltaT1 := astro.DeltaT(jd)
+	//	deltaT2 := swe.NewSwe().DeltaT(float64(jd))
+	//	fmt.Printf("JD: %v -> %f deltaT %v / %v \n", t, jd, deltaT1, deltaT2)
+	//
+	//}
 
-	t := time.Date(2020, 9, 30, 4, 0, 0, 0, time.UTC)
+	year, month, day := time.Now().Date()
+	t := time.Date(year, month, day, 4, 0, 0, 0, time.UTC)
 
 	jd := astro.TimeToJulianDay(t)
 	deltaT := astro.DeltaT(jd)
@@ -20,22 +27,26 @@ func main() {
 	fmt.Printf("JD: %f at %v \n", jd, jd.ToTime(time.UTC))
 	fmt.Printf("ET: %f at %v deltaT: %v\n", et, etT, deltaT)
 
-	long, _ := astro.StringToDegree("116°23'")
-	lat, _ := astro.StringToDegree("39°54'")
+	long, _ := astro.StringToDegrees("116°23'")
+	lat, _ := astro.StringToDegrees("39°54'")
 	fmt.Printf("Geo: %f %f\n", long, lat)
 
 	geo := &astro.GeographicCoordinates{
-		Longitude: astro.ToRadian(long),
-		Latitude:  astro.ToRadian(lat),
+		Longitude: astro.ToRadians(long),
+		Latitude:  astro.ToRadians(lat),
 	}
 	tz, _ := time.LoadLocation("Asia/Shanghai")
 
-	times := astro.SunTwilight(jd, geo, false)
+	sunTimes := astro.SunTwilight(jd, geo, false)
 
-	fmt.Printf("Sun Rise: %v\n", times.Rise.ToTime(nil).In(tz))
-	fmt.Printf("Sun Set: %v\n", times.Set.ToTime(nil).In(tz))
-	fmt.Printf("Sun Noon: %v\n", times.Noon.ToTime(nil).In(tz))
-	fmt.Printf("Sun Midnight: %v\n", times.Midnight.ToTime(nil).In(tz))
-	fmt.Printf("Sun Civil : %v %v\n", times.Civil.Dawn.ToTime(nil).In(tz), times.Civil.Dusk.ToTime(nil).In(tz))
+	fmt.Printf("Sun Rise: %v\n", sunTimes.Rise.ToTime(nil).In(tz))
+	fmt.Printf("Sun Set: %v\n", sunTimes.Set.ToTime(nil).In(tz))
+	fmt.Printf("Sun Culmination: %v | %v\n", sunTimes.Culmination.ToTime(nil).In(tz), sunTimes.LowerCulmination.ToTime(nil).In(tz))
+	fmt.Printf("Sun Civil : %v | %v\n", sunTimes.Civil.Dawn.ToTime(nil).In(tz), sunTimes.Civil.Dusk.ToTime(nil).In(tz))
 
+	moonTimes := astro.MoonTwilight(jd, geo, false)
+
+	fmt.Printf("Moon Rise: %v\n", moonTimes.Rise.ToTime(nil).In(tz))
+	fmt.Printf("Moon Set: %v\n", moonTimes.Set.ToTime(nil).In(tz))
+	fmt.Printf("Moon Culmination: %v | %v\n", moonTimes.Culmination.ToTime(nil).In(tz), moonTimes.LowerCulmination.ToTime(nil).In(tz))
 }

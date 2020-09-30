@@ -23,13 +23,13 @@ const (
 	PointString   = '.'
 )
 
-// ToDegree 弧度转换为角度
-func ToDegree(r float64) float64 {
+// ToDegrees 弧度转换为角度
+func ToDegrees(r float64) float64 {
 	return r * 180. / math.Pi
 }
 
 // 对超过0~2PI的角度转为0~2PI,也就是超过360°转换为360°以内
-func RadianMod360(r float64) float64 {
+func RadiansMod360(r float64) float64 {
 	_r := math.Mod(r, Radian360)
 
 	if _r < 0 {
@@ -39,7 +39,7 @@ func RadianMod360(r float64) float64 {
 }
 
 // 对超过-PI到PI的角度转为-PI到PI, 即转化到-180°~180°
-func RadianMod180(r float64) float64 {
+func RadiansMod180(r float64) float64 {
 	_r := math.Mod(r, Radian360)
 	if _r < -Radian180 {
 		return _r + Radian360
@@ -49,13 +49,13 @@ func RadianMod180(r float64) float64 {
 	return _r
 }
 
-// ToRadian 角度转换为弧度
-func ToRadian(d float64) float64 {
+// ToRadians 角度转换为弧度
+func ToRadians(d float64) float64 {
 	return d * math.Pi / 180.
 }
 
 // String 角度转换为书面表达的 ° ′ ″
-func DegreeToString(d float64) string {
+func DegreesToString(d float64) string {
 	var deg, min int
 	var sec float64
 	var absDegree = math.Abs(d)
@@ -68,8 +68,8 @@ func DegreeToString(d float64) string {
 }
 
 // ParseDMS parses a coordinate in degrees, minutes, seconds.
-// - e.g. 33° 23' 22"
-func StringToDegree(s string) (float64, error) {
+// - e.g. 33° 23' 22"ma
+func StringToDegrees(s string) (float64, error) {
 	degrees := 0
 	minutes := 0
 	seconds := 0.0
@@ -119,14 +119,22 @@ func StringToDegree(s string) (float64, error) {
 	return val, nil
 }
 
-// 临界余数(a与最近的整倍数b相差的距离)
-func Mod2(a, b float64) float64 {
-	c := a / b
+/**
+ * 时间 转 角度
+ * 赤经、恒星时、时角 有一种小时表示的单位，也就是24h = 360°
+ */
+func HoursToDegrees(hours float64) float64 {
+	return hours * 15
+}
+
+// 临界余数(v与最近的整倍数n相差的距离)
+func Mod2(v, n float64) float64 {
+	c := v / n
 	c -= math.Floor(c)
 
 	if c > .5 {
 		c -= 1
 	}
 
-	return c * b
+	return c * n
 }

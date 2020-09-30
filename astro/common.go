@@ -64,7 +64,7 @@ func Parallax(equatorial EquatorialCoordinates, distance, hourAngle, latitude, h
 	a := math.Atan2(cosD*sinH, cosW+cosD*cosH)
 
 	return &GeographicCoordinates{
-		Longitude: RadianMod360(equatorial.RightAscension + a),
+		Longitude: RadiansMod360(equatorial.RightAscension + a),
 		Latitude:  math.Atan((sinW + sinD) / (cosW + cosD*cosH) * math.Cos(a)),
 	}
 }

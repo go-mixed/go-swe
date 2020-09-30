@@ -5,6 +5,26 @@ import (
 	"math"
 )
 
+const (
+	EquatorialRadius           = 6378.1366                                                                // 地球赤道半径(千米)
+	MeanEquatorialRadius       = 0.99834 * EquatorialRadius                                               //平均半径
+	PolarEquatorialRatio       = 0.99664719                                                               // 地球极赤半径比
+	PolarEquatorialRatioSquare = PolarEquatorialRatio * PolarEquatorialRatio                              // 地球极赤半径比的平方
+	AU                         = 1.49597870691e8                                                          // 天文单位长度(千米)
+	SinSolarParallax           = EquatorialRadius / AU                                                    // sin(太阳视差)
+	LightVelocity              = 299792.458                                                               // 光速(行米/秒)
+	LightTimePerAU             = AU / LightVelocity / 86400 / 36525                                       // 每天文单位的光行时间(儒略世纪)
+	LunarEarthRatio            = 0.2725076                                                                // 月亮与地球的半径比(用于半影计算)
+	LunarEarthRatio2           = 0.2722810                                                                // 月亮与地球的半径比(用于本影计算)
+	SolarEarthRatio            = 109.1222                                                                 // 太阳与地球的半径比(对应959.64)
+	ApparentLunarRadius        = LunarEarthRatio * EquatorialRadius * 1.0000036 * DegreeSecondsPerRadian  // 用于月亮视半径计算
+	ApparentLunarRadius2       = LunarEarthRatio2 * EquatorialRadius * 1.0000036 * DegreeSecondsPerRadian // 用于月亮视半径计算
+	ApparentSolarRadius        = 959.64                                                                   // 用于太阳视半径计算
+)
+
+var SolarParallax = math.Asin(SinSolarParallax)                                      // 太阳视差
+var PlanetaryRendezvousPeriod = [...]float64{116, 584, 780, 399, 378, 370, 367, 367} //行星会合周期
+
 type Astronomy struct {
 	// 地理位置
 	Geo *GeographicCoordinates
@@ -35,7 +55,7 @@ type EclipticProperties struct {
 type PlanetProperties struct {
 	// 黄道坐标
 	Ecliptic *EclipticCoordinates
-	// 距离
+	// 距离 单位是 AU, 转化为千米 则是 Distance * AU
 	Distance float64
 	// 经度的速度
 	SpeedInLongitude float64
@@ -51,15 +71,24 @@ type PlanetProperties struct {
 	Horizontal *HorizontalCoordinates
 }
 
-func NewAstronomy(geo *GeographicCoordinates, jdUt JulianDay) *Astronomy {
+// 返回千米为单位的距离
+func (p *PlanetProperties) DistanceAsKilometer() float64 {
+	return p.Distance * AU
+}
 
+func NewAstronomy(geo *GeographicCoordinates, jdUt JulianDay) *Astronomy {
 	_swe := swe.NewSwe()
-	return &Astronomy{
-		Geo:    geo,
-		JdUt:   jdUt,
-		DeltaT: DeltaT(jdUt),
-		Swe:    _swe,
-	}
+	return (&Astronomy{
+		Swe: _swe,
+	}).Update(geo, jdUt)
+}
+
+// 更新 geo和jdUT
+func (astro *Astronomy) Update(geo *GeographicCoordinates, jdUt JulianDay) *Astronomy {
+	astro.JdUt = jdUt
+	astro.DeltaT = astro.Swe.DeltaT(float64(jdUt))
+	astro.Geo = geo
+	return astro
 }
 
 // 儒略日(天文时)
@@ -110,7 +139,7 @@ func (astro *Astronomy) PlanetBaseProperties(planetId swe.Planet) (*PlanetProper
 			Longitude: res[0],
 			Latitude:  res[1],
 		},
-		Distance:         0,
+		Distance:         res[2],
 		SpeedInLongitude: res[3],
 		SpeedInLatitude:  res[4],
 		SpeedInDistance:  res[5],
@@ -143,12 +172,24 @@ func (astro *Astronomy) PlanetProperties(planetId swe.Planet, withRevise bool) (
 	// 黄道坐标 -> 赤道坐标
 	equatorial := EclipticToEquatorial(planet.Ecliptic, IfThenElse(withRevise, ecliptic.TrueObliquity, ecliptic.MeanObliquity).(float64))
 
+	var sidTime float64
+	/* 快速计算sidreal time
 	// 不太精确的恒星时
-	sidTime := GreenwichMeridianSiderealTime(astro.JdUt, astro.DeltaT)
+	sidTime = GreenwichMeridianSiderealTime(astro.JdUt, astro.DeltaT)
 	// 修正恒星时
 	if withRevise {
 		sidTime += ecliptic.NutationInLongitude * math.Cos(ecliptic.TrueObliquity)
 	}
+	*/
+
+	// 使用swe计算恒星时
+	if withRevise {
+		sidTime, _ = astro.Swe.SidTime0(float64(astro.JdUt), ToDegrees(ecliptic.TrueObliquity), ToDegrees(ecliptic.NutationInLongitude), nil)
+	} else {
+		sidTime, _ = astro.Swe.SidTime(float64(astro.JdUt), nil)
+	}
+	// swe 返回的单位是角度的时间表示方式. * 15 则为度
+	sidTime = ToRadians(HoursToDegrees(sidTime))
 
 	/*
 		https://en.wikipedia.org/wiki/Hour_angle
@@ -158,7 +199,7 @@ func (astro *Astronomy) PlanetProperties(planetId swe.Planet, withRevise bool) (
 	*/
 
 	// 时角，转换到-180°~180°内
-	hourAngle := HourAngle(RadianMod180(sidTime + astro.Geo.Longitude - equatorial.RightAscension))
+	hourAngle := HourAngle(RadiansMod180(sidTime + astro.Geo.Longitude - equatorial.RightAscension))
 
 	var horizontal *HorizontalCoordinates
 
@@ -167,7 +208,7 @@ func (astro *Astronomy) PlanetProperties(planetId swe.Planet, withRevise bool) (
 			Longitude: Radian90 - float64(hourAngle),
 			Latitude:  equatorial.Declination,
 		}, Radian90-astro.Geo.Latitude)
-		_horizontal.Longitude = RadianMod360(Radian90 - _horizontal.Longitude)
+		_horizontal.Longitude = RadiansMod360(Radian90 - _horizontal.Longitude)
 
 		//修正大气折射
 		if _horizontal.Latitude > 0 {

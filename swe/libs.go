@@ -1,4 +1,5 @@
 package swe
+
 /*
 // To aid debugging the Swiss Ephemeris supports tracing. It will write two
 // files in the current working directory. Note that the Go tool may change the
@@ -410,7 +411,7 @@ func latToLMT(jdLAT, geolon float64) (float64, error) {
  * Greenwich Meridian sidereal time
  * ut: Julian day number, UT
  * eps: obliquity of ecliptic, in degrees 黄道的倾角
- * nut: nutation in longitude, in degrees 经度的章动
+ * nut: nutation in longitude, in degrees 黄经的章动
  */
 func sidTime0(ut, eps, nut float64) float64 {
 	_ut := C.double(ut)
@@ -427,4 +428,3 @@ func sidTime0(ut, eps, nut float64) float64 {
 func sidTime(ut float64) float64 {
 	return float64(C.swe_sidtime(C.double(ut)))
 }
-

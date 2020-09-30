@@ -198,7 +198,7 @@ var dtAt = [...]float64{
 	1960, 33.2, 0.51, 0.231, -0.0109,
 	1980, 51.0, 1.29, -0.026, 0.0032,
 	2000, 63.87, 0.1, 0, 0,
-	2005, 64.7, 0.4, 0, 0, //一次项记为x,则 10x=0.4秒/年*(2015-2005),解得x=0.4
+	2005, 64.7, 0.4, 0, 0, // 一次项记为x,则 10x=0.4秒/年*(2015-2005),解得x=0.4
 	2015, 69,
 }
 
@@ -212,15 +212,15 @@ func dtExt(y, jsd float64) float64 {
 func dtCalc(y float64) float64 {
 	dtAtLen := len(dtAt)
 
-	var y0 = dtAt[dtAtLen-2] //表中最后一年
-	var t0 = dtAt[dtAtLen-1] //表中最后一年的deltatT
+	var y0 = dtAt[dtAtLen-2] // 表中最后一年
+	var t0 = dtAt[dtAtLen-1] // 表中最后一年的deltaT
 	if y >= y0 {
-		var jsd = 31. //sjd是y1年之后的加速度估计。瑞士星历表jsd=31,NASA网站jsd=32,skmap的jsd=29
+		var jsd = 31. // sjd是y1年之后的加速度估计。瑞士星历表jsd=31,NASA网站jsd=32,skmap的jsd=29
 		if y > y0+100 {
 			return dtExt(y, jsd)
 		}
-		var v = dtExt(y, jsd)        //二次曲线外推
-		var dv = dtExt(y0, jsd) - t0 //ye年的二次外推与te的差
+		var v = dtExt(y, jsd)        // 二次曲线外推
+		var dv = dtExt(y0, jsd) - t0 // ye年的二次外推与te的差
 		return v - dv*(y0+100-y)/100
 	}
 	var i int

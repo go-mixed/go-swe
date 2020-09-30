@@ -240,7 +240,7 @@ func EclipticEquatorialConverter(coordinates *GeographicCoordinates, eclipticObl
 	longitude := math.Atan2(sinJ*cosE-tanW*sinE, cosJ)
 	latitude := math.Asin(sinW*cosE + cosW*sinE*sinJ)
 
-	longitude = RadianMod360(longitude) //保证在360度内
+	longitude = RadiansMod360(longitude) //保证在360度内
 
 	return &GeographicCoordinates{
 		Longitude: longitude,
