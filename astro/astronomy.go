@@ -26,21 +26,15 @@ var SolarParallax = math.Asin(SinSolarParallax)                                 
 var PlanetaryRendezvousPeriod = [...]float64{116, 584, 780, 399, 378, 370, 367, 367} //行星会合周期
 
 type Astronomy struct {
-	// 地理位置
-	Geo *GeographicCoordinates
-	// 儒略日(世界时)
-	JdUt JulianDay
-	// JD 和 ET 的 deltaT
-	DeltaT float64
 	// Swe的实例
 	Swe swe.SweInterface
 }
 
 type EclipticProperties struct {
-	// 真黄道真倾角(含章动)，即黄赤交角，转轴倾角
+	// 真黄赤交角(含章动)，即转轴倾角
 	// true obliquity of the Ecliptic (includes nutation)
 	TrueObliquity float64
-	// 黄道平均倾角
+	// 平黄赤交角
 	// 比如地球是：23°26′20.512″
 	// mean obliquity of the Ecliptic
 	MeanObliquity float64
@@ -53,13 +47,14 @@ type EclipticProperties struct {
 }
 
 type PlanetProperties struct {
+	PlanetId swe.Planet
 	// 黄道坐标
 	Ecliptic *EclipticCoordinates
 	// 距离 单位是 AU, 转化为千米 则是 Distance * AU
 	Distance float64
-	// 经度的速度
+	// 黄经的速度 单位是 弧度/天
 	SpeedInLongitude float64
-	// 纬度的速度
+	// 黄纬的速度 单位是 弧度/天
 	SpeedInLatitude float64
 	// 距离的速度
 	SpeedInDistance float64
@@ -76,40 +71,37 @@ func (p *PlanetProperties) DistanceAsKilometer() float64 {
 	return p.Distance * AU
 }
 
-func NewAstronomy(geo *GeographicCoordinates, jdUt JulianDay) *Astronomy {
+func NewAstronomy() *Astronomy {
 	_swe := swe.NewSwe()
-	return (&Astronomy{
+	return &Astronomy{
 		Swe: _swe,
-	}).Update(geo, jdUt)
+	}
 }
 
-// 更新 geo和jdUT
-func (astro *Astronomy) Update(geo *GeographicCoordinates, jdUt JulianDay) *Astronomy {
-	astro.JdUt = jdUt
-	astro.DeltaT = astro.Swe.DeltaT(float64(jdUt))
-	astro.Geo = geo
-	return astro
+func (astro *Astronomy) DeltaTEx(jdUT JulianDay) float64 {
+	deltaT, _ := astro.Swe.DeltaTEx(float64(jdUT), swe.FlagEphSwiss)
+	return deltaT
 }
 
-// 儒略日(天文时)
-func (astro *Astronomy) JdEt() JulianDay {
-	return astro.JdUt.ToEphemerisTime(astro.DeltaT)
+func (astro *Astronomy) DeltaT(jdUT JulianDay) float64 {
+	return astro.Swe.DeltaT(float64(jdUT))
 }
 
-func (astro *Astronomy) simpleCalcFlags() *swe.CalcFlags {
+func (astro *Astronomy) simpleCalcFlags(deltaT float64) *swe.CalcFlags {
 	var iFlag int32 = swe.FlagEphSwiss | swe.FlagRadians | swe.FlagSpeed
 	return &swe.CalcFlags{
-		Flags: iFlag,
+		Flags:  iFlag,
+		DeltaT: &deltaT,
 	}
 }
 
 /**
  * 黄道属性，包含倾角、章动
  */
-func (astro *Astronomy) EclipticProperties() (*EclipticProperties, error) {
+func (astro *Astronomy) EclipticProperties(jdET *EphemerisTime) (*EclipticProperties, error) {
 
 	// 黄道章动
-	res, _, err := astro.Swe.Calc(float64(astro.JdEt()), swe.EclNut, astro.simpleCalcFlags())
+	res, _, err := astro.Swe.Calc(jdET.Value(), swe.EclNut, astro.simpleCalcFlags(jdET.DeltaT))
 
 	if err != nil {
 		return nil, err
@@ -124,17 +116,18 @@ func (astro *Astronomy) EclipticProperties() (*EclipticProperties, error) {
 }
 
 /**
- * 天体的基础属性，包括黄道经纬，距离，黄道经纬速度，距离速度
+ * 天体属性，包括黄道经纬，距离，黄道经纬速度，距离速度
  */
-func (astro *Astronomy) PlanetBaseProperties(planetId swe.Planet) (*PlanetProperties, error) {
+func (astro *Astronomy) PlanetProperties(planetId swe.Planet, jdET *EphemerisTime) (*PlanetProperties, error) {
 	// 天体的基本属性：黄道坐标、距离等参数
-	res, _, err := astro.Swe.Calc(float64(astro.JdEt()), planetId, astro.simpleCalcFlags())
+	res, _, err := astro.Swe.Calc(jdET.Value(), planetId, astro.simpleCalcFlags(jdET.DeltaT))
 
 	if err != nil {
 		return nil, err
 	}
 
 	return &PlanetProperties{
+		PlanetId: planetId,
 		Ecliptic: &EclipticCoordinates{
 			Longitude: res[0],
 			Latitude:  res[1],
@@ -151,15 +144,19 @@ func (astro *Astronomy) PlanetBaseProperties(planetId swe.Planet) (*PlanetProper
  * 关于HA的计算，因为章动同时影响恒星时和赤道坐标，所以不计算章动。
  * withRevise 是否修正，包含使用真黄道倾角、修正大气折射、修正地平坐标中视差
  */
-func (astro *Astronomy) PlanetProperties(planetId swe.Planet, withRevise bool) (planet *PlanetProperties, err error) {
+func (astro *Astronomy) PlanetPropertiesWithObserver(
+	planetId swe.Planet,
+	jdET *EphemerisTime,
+	geo *GeographicCoordinates,
+	withRevise bool) (planet *PlanetProperties, err error) {
 	// 当前黄道倾角、章动等参数
-	ecliptic, err := astro.EclipticProperties()
+	ecliptic, err := astro.EclipticProperties(jdET)
 	if err != nil {
 		return
 	}
 
 	// 天体的基本属性：黄道坐标、距离等参数
-	planet, err = astro.PlanetBaseProperties(planetId)
+	planet, err = astro.PlanetProperties(planetId, jdET)
 	if err != nil {
 		return
 	}
@@ -184,9 +181,9 @@ func (astro *Astronomy) PlanetProperties(planetId swe.Planet, withRevise bool) (
 
 	// 使用swe计算恒星时
 	if withRevise {
-		sidTime, _ = astro.Swe.SidTime0(float64(astro.JdUt), ToDegrees(ecliptic.TrueObliquity), ToDegrees(ecliptic.NutationInLongitude), nil)
+		sidTime, _ = astro.Swe.SidTime0(float64(jdET.JdUT), ToDegrees(ecliptic.TrueObliquity), ToDegrees(ecliptic.NutationInLongitude), &swe.SidTimeFlags{DeltaT: &jdET.DeltaT})
 	} else {
-		sidTime, _ = astro.Swe.SidTime(float64(astro.JdUt), nil)
+		sidTime, _ = astro.Swe.SidTime(float64(jdET.JdUT), &swe.SidTimeFlags{DeltaT: &jdET.DeltaT})
 	}
 	// swe 返回的单位是角度的时间表示方式. * 15 则为度
 	sidTime = ToRadians(HoursToDegrees(sidTime))
@@ -199,7 +196,7 @@ func (astro *Astronomy) PlanetProperties(planetId swe.Planet, withRevise bool) (
 	*/
 
 	// 时角，转换到-180°~180°内
-	hourAngle := HourAngle(RadiansMod180(sidTime + astro.Geo.Longitude - equatorial.RightAscension))
+	hourAngle := HourAngle(RadiansMod180(sidTime + geo.Longitude - equatorial.RightAscension))
 
 	var horizontal *HorizontalCoordinates
 
@@ -207,7 +204,7 @@ func (astro *Astronomy) PlanetProperties(planetId swe.Planet, withRevise bool) (
 		_horizontal := EclipticEquatorialConverter(&GeographicCoordinates{
 			Longitude: Radian90 - float64(hourAngle),
 			Latitude:  equatorial.Declination,
-		}, Radian90-astro.Geo.Latitude)
+		}, Radian90-geo.Latitude)
 		_horizontal.Longitude = RadiansMod360(Radian90 - _horizontal.Longitude)
 
 		//修正大气折射
@@ -218,7 +215,7 @@ func (astro *Astronomy) PlanetProperties(planetId swe.Planet, withRevise bool) (
 		_horizontal.Latitude -= 8.794 / DegreeSecondsPerRadian / planet.Distance * math.Cos(_horizontal.Latitude)
 		horizontal = _horizontal.AsHorizontalCoordinates()
 	} else {
-		horizontal = EquatorialToHorizontal(hourAngle, equatorial.Declination, astro.Geo.Latitude)
+		horizontal = EquatorialToHorizontal(hourAngle, equatorial.Declination, geo.Latitude)
 	}
 
 	planet.HourAngle = hourAngle

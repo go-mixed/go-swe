@@ -11,10 +11,13 @@ import (
 
 // 每弧度的角秒数，此处的3600是因为 1° == 3600″
 // 所以可读的表达式为 角° = 1 弧度 * 180 / Pi; 角″ = 角° * 3600
-const DegreeSecondsPerRadian float64 = 1 * 180 * 3600. / math.Pi
-const Radian90 float64 = math.Pi / 2.
-const Radian180 float64 = math.Pi
-const Radian360 float64 = math.Pi * 2
+const (
+	DegreeSecondsPerRadian float64 = 1 * 180 * 3600. / math.Pi
+	Radian90               float64 = math.Pi / 2.
+	Radian180              float64 = math.Pi
+	Radian360              float64 = math.Pi * 2
+	MinimumFloat           float64 = 0.00000000001
+)
 
 const (
 	DegreesRune = '\u00B0'
@@ -130,11 +133,31 @@ func HoursToDegrees(hours float64) float64 {
 // 临界余数(v与最近的整倍数n相差的距离)
 func Mod2(v, n float64) float64 {
 	c := v / n
-	c -= math.Floor(c)
+	c -= math.Floor(c) // 取两者余数的小数部分
 
 	if c > .5 {
 		c -= 1
 	}
 
-	return c * n
+	return c * n // 得到余数
+}
+
+// 取一下倍数
+// 比如: NextMultiples(31, 15) = 45  30的下一个符合15的倍数是45
+// NextMultiples(30, 15) = 30
+func NextMultiples(v, n float64) float64 {
+	c := v / n
+	i := math.Floor(c)     // 取两者的整数部分
+	d := c - math.Floor(c) // 取两者余数的小数部分
+
+	// 有余数
+	if d > MinimumFloat {
+		i++
+	}
+
+	return n * i
+}
+
+func FloatEqual(x, y float64) bool {
+	return math.Abs(x-y) < MinimumFloat
 }

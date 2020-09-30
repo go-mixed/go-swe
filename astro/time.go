@@ -8,6 +8,11 @@ import (
 
 type JulianDay float64
 
+type EphemerisTime struct {
+	JdUT   JulianDay
+	DeltaT float64
+}
+
 const JD2000 JulianDay = 2451545.
 
 // time 转为 儒略日 JulianDay
@@ -47,6 +52,20 @@ func ExtractJulianDay(jd JulianDay) (year, month, day, hour, minute int, second 
 	year, month, day, hours, _ := swe.NewSwe().RevJul(float64(jd), swe.Gregorian)
 	hour, minute, second = ExtractJulianDayHours(hours)
 	return
+}
+
+func NewEphemerisTime(jdUT JulianDay) *EphemerisTime {
+	return (&EphemerisTime{}).Update(jdUT)
+}
+
+func (et *EphemerisTime) Value() float64 {
+	return float64(et.JdUT.ToEphemerisTime(et.DeltaT))
+}
+
+func (et *EphemerisTime) Update(jdUT JulianDay) *EphemerisTime {
+	et.JdUT = jdUT
+	et.DeltaT = DeltaT(jdUT) //.DeltaT(float64(jdUT))
+	return et
 }
 
 // Ephemeris time 天文历时

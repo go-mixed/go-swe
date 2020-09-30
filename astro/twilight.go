@@ -155,57 +155,79 @@ var moonLowerCulminationCallback = func(hourAngle HourAngle, baseHourAngle HourA
 	return Radian180 - float64(baseHourAngle)/(Radian360*0.966)
 }
 
-var reviseHourAngle = func(astro *Astronomy,
-	planet *PlanetProperties,
-	planetId swe.Planet,
-	jd JulianDay,
+/**
+ * 指定高度角，反推出当时的儒略日
+ * lastPlanet 初步计算的天体属性
+ * jdET 初步计算的时间
+ * geo 观察者地理位置
+ * angle 指定需要计算的高度角
+ * withRevise 是否修正
+ * callback ha的计算函数
+ */
+func calcJulianDayByAltitude(
+	astro *Astronomy,
+	lastPlanet *PlanetProperties,
+	jdET *EphemerisTime,
+	geo *GeographicCoordinates,
 	angle float64,
 	withRevise bool,
-	callback haToDeltaCallback) (_jd JulianDay) {
-	_jd = jd
-	var ha, _ha HourAngle
+	callback haToDeltaCallback,
+) (_jdUT JulianDay) {
+
+	_jdUT = jdET.JdUT
+	_jdET := jdET
+	var _ha HourAngle
+	var _err error
 
 	// 计算第一次
 	if math.Abs(angle) < Radian90 {
-		ha = AltitudeToHourAngle(planet.Equatorial.Declination, astro.Geo.Latitude, angle)
+		_ha = AltitudeToHourAngle(lastPlanet.Equatorial.Declination, geo.Latitude, angle)
 	}
 
-	_jd = _jd.Add(callback(ha, planet.HourAngle, false))
+	_jdUT = _jdUT.Add(callback(_ha, lastPlanet.HourAngle, false))
 
 	// 多修正几次
 	for i := 0; i < 3; i++ {
-		_planet, _err := astro.Update(astro.Geo, _jd).PlanetProperties(planetId, withRevise)
+		_jdET = NewEphemerisTime(_jdUT)
+		lastPlanet, _err = astro.PlanetPropertiesWithObserver(lastPlanet.PlanetId, _jdET, geo, withRevise)
 		if _err != nil {
 			return
 		}
 
 		if math.Abs(angle) < Radian90 {
-			_ha = AltitudeToHourAngle(_planet.Equatorial.Declination, astro.Geo.Latitude, angle)
+			_ha = AltitudeToHourAngle(lastPlanet.Equatorial.Declination, geo.Latitude, angle)
 		}
 
-		_jd = _jd.Add(callback(_ha, _planet.HourAngle, true))
+		_jdUT = _jdUT.Add(callback(_ha, lastPlanet.HourAngle, true))
 	}
 
 	return
 }
 
-func PlanetTwilight(jdUT JulianDay, geo *GeographicCoordinates, planetId swe.Planet, angle *TwilightAngle, withRevise bool) *TwilightTimes {
+/**
+ * 天体升/降/中天时间
+ * jdUT UT的儒略日
+ * geo 观察者地理位置
+ * planetId 天体ID
+ * angle 升/降/中天的角度
+ * withRevise 是否修正一些日光差，或者黄道章动
+ */
+func (astro *Astronomy) PlanetTwilight(jdUT JulianDay, geo *GeographicCoordinates, planetId swe.Planet, angle *TwilightAngle, withRevise bool) *TwilightTimes {
+	jdET := NewEphemerisTime(jdUT)
+
 	if angle == nil {
 		angle = NewTwilightAngle()
 	}
-
 	times := &TwilightTimes{}
 
-	astro := NewAstronomy(geo, jdUT)
-
 	// 天体属性
-	planet, err := astro.PlanetProperties(planetId, withRevise)
+	planet, err := astro.PlanetPropertiesWithObserver(planetId, jdET, geo, withRevise)
 	if err != nil {
 		return nil
 	}
 
 	var _reviseHourAngle = func(angle float64, callback haToDeltaCallback) JulianDay {
-		return reviseHourAngle(astro, planet, planetId, jdUT, angle, withRevise, callback)
+		return calcJulianDayByAltitude(astro, planet, jdET, geo, angle, withRevise, callback)
 	}
 
 	times.Rise = _reviseHourAngle(angle.RiseSet, riseCallback)
@@ -217,28 +239,27 @@ func PlanetTwilight(jdUT JulianDay, geo *GeographicCoordinates, planetId swe.Pla
 }
 
 /**
- * 太阳升降/中天时间
- * 传入本地12点的JdUT(比如东八区需要4点: TimeToJulianDay(2020-09-30 04:00:00))，地理坐标
+ * 太阳升/降/中天/晨/暮时间
+ * jdUT UT的儒略日，传入本地12点的JdUT(比如东八区是当天4点: TimeToJulianDay(2020-09-30 04:00:00))
+ * geo 观察者地理位置
  * withRevise: 是否修正一些日光差，或者黄道章动
  */
-func SunTwilight(jdUT JulianDay, geo *GeographicCoordinates, withRevise bool) *SunTwilightTimes {
-
+func (astro *Astronomy) SunTwilight(jdUT JulianDay, geo *GeographicCoordinates, withRevise bool) *SunTwilightTimes {
 	// 查找最靠近当日中午的日上中天, mod2的第1参数为本地时角近似值
 	noonJdUT := jdUT.Add(-Mod2(float64(jdUT.AsJD2000())+geo.Longitude/Radian360, 1))
+	jdET := NewEphemerisTime(noonJdUT)
 
 	angle := NewSunTwilightAngle()
 	sunTimes := &SunTwilightTimes{}
 
-	astro := NewAstronomy(geo, noonJdUT)
-
 	// 天体属性
-	planet, err := astro.PlanetProperties(swe.Sun, withRevise)
+	planet, err := astro.PlanetPropertiesWithObserver(swe.Sun, jdET, geo, withRevise)
 	if err != nil {
 		return nil
 	}
 
 	var _reviseHourAngle = func(angle float64, callback haToDeltaCallback) JulianDay {
-		return reviseHourAngle(astro, planet, swe.Sun, noonJdUT, angle, withRevise, callback)
+		return calcJulianDayByAltitude(astro, planet, jdET, geo, angle, withRevise, callback)
 	}
 
 	sunTimes.Rise = _reviseHourAngle(angle.RiseSet, riseCallback)
@@ -256,21 +277,23 @@ func SunTwilight(jdUT JulianDay, geo *GeographicCoordinates, withRevise bool) *S
 }
 
 /**
- * 太阳升降/中天时间
- * 传入本地12点的JdUT(比如东八区需要4点: TimeToJulianDay(2020-09-30 04:00:00))，地理坐标
+ * 月亮升/降/中天时间
+ * jdUT UT的儒略日，传入本地12点的JdUT(比如东八区是当天4点: TimeToJulianDay(2020-09-30 04:00:00))
+ * geo 观察者地理位置
  * withRevise: 是否修正一些日光差，或者黄道章动
  */
-func MoonTwilight(jdUT JulianDay, geo *GeographicCoordinates, withRevise bool) *TwilightTimes {
+func (astro *Astronomy) MoonTwilight(jdUT JulianDay, geo *GeographicCoordinates, withRevise bool) *TwilightTimes {
+	deltaT := astro.DeltaT(jdUT)
+
+	// 查找最靠近当日中午的月上中天, mod2的第1参数为本地时角近似值
+	moonJdUT := jdUT.Add(-Mod2(0.1726222+0.966136808032357*float64(jdUT.AsJD2000())-0.0366*deltaT+geo.Longitude/Radian360, 1))
+	jdET := NewEphemerisTime(moonJdUT)
+
 	angle := NewTwilightAngle()
 	moonTimes := &TwilightTimes{}
 
-	astro := NewAstronomy(geo, jdUT)
-	// 查找最靠近当日中午的月上中天, mod2的第1参数为本地时角近似值
-	moonJdUT := jdUT.Add(-Mod2(0.1726222+0.966136808032357*float64(jdUT.AsJD2000())-0.0366*astro.DeltaT+geo.Longitude/Radian360, 1))
-	astro.Update(geo, moonJdUT)
-
 	// 天体属性
-	planet, err := astro.PlanetProperties(swe.Moon, withRevise)
+	planet, err := astro.PlanetPropertiesWithObserver(swe.Moon, jdET, geo, withRevise)
 	if err != nil {
 		return nil
 	}
@@ -278,7 +301,7 @@ func MoonTwilight(jdUT JulianDay, geo *GeographicCoordinates, withRevise bool) *
 	angle.RiseSet = 0.7275*EquatorialRadius/planet.DistanceAsKilometer() - 34*60/DegreeSecondsPerRadian
 
 	var _reviseHourAngle = func(angle float64, callback haToDeltaCallback) JulianDay {
-		return reviseHourAngle(astro, planet, swe.Moon, moonJdUT, angle, withRevise, callback)
+		return calcJulianDayByAltitude(astro, planet, jdET, geo, angle, withRevise, callback)
 	}
 
 	moonTimes.Rise = _reviseHourAngle(angle.RiseSet, moonRiseCallback)
