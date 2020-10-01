@@ -9,14 +9,18 @@ import (
 	"unicode"
 )
 
-// 每弧度的角秒数，此处的3600是因为 1° == 3600″
-// 所以可读的表达式为 角° = 1 弧度 * 180 / Pi; 角″ = 角° * 3600
 const (
+	// 每弧度的角秒数，此处的3600是因为 1° == 3600″
+	// 所以可读的表达式为 角° = 1 弧度 * 180 / Pi; 角″ = 角° * 3600
 	DegreeSecondsPerRadian float64 = 1 * 180 * 3600. / math.Pi
-	Radian90               float64 = math.Pi / 2.
-	Radian180              float64 = math.Pi
-	Radian360              float64 = math.Pi * 2
-	MinimumFloat           float64 = 0.00000000001
+	// 90°的弧度
+	Radian90 float64 = math.Pi / 2.
+	// 180°的弧度
+	Radian180 float64 = math.Pi
+	// 360°的弧度
+	Radian360 float64 = math.Pi * 2
+	// 两个浮点数相等的最小差异
+	MinimumFloat float64 = 0.00000000001
 )
 
 const (
@@ -158,6 +162,7 @@ func NextMultiples(v, n float64) float64 {
 	return n * i
 }
 
+// 求2个浮点数是否相等
 func FloatEqual(x, y float64) bool {
 	return math.Abs(x-y) < MinimumFloat
 }

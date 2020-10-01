@@ -182,8 +182,10 @@ func AltitudeToHourAngle(declination, latitude, altitude float64) HourAngle {
 	ha := (math.Sin(altitude) - math.Sin(latitude)*math.Sin(declination)) / math.Cos(declination) / math.Cos(latitude)
 
 	// > 180°
-	if math.Abs(ha) > 1 {
-		return HourAngle(Radian180)
+	if ha > 1 {
+		ha = 1
+	} else if ha < -1 {
+		ha = -1
 	}
 	return HourAngle(math.Acos(ha))
 }
