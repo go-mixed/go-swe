@@ -9,7 +9,7 @@ var SolarTermsString = [...]string{
 }
 
 /**
- * 指定太阳黄经, 反推出当时的儒略日
+ * 指定太阳黄经, 反推出当时的时间
  * firstDayJdET 当年首日的 jdET
  * firstDayPlanet 当年首日的天体属性
  * eclipticLongitude 目标黄经
@@ -31,7 +31,7 @@ func calcJulianDayBySolarEclipticLongitude(
 
 	for {
 		// 已经到了目标黄经, 返回结果
-		if FloatEqual(_eclipticLongitudeDelta, _lastLongDelta) {
+		if FloatEqual(_eclipticLongitudeDelta, _lastLongDelta, 9) {
 			return _jd, nil
 		}
 
@@ -53,17 +53,17 @@ func calcJulianDayBySolarEclipticLongitude(
 }
 
 /**
- * 指定太阳黄经(数组), 反推出当时的儒略日(数组)
+ * 指定太阳黄经(数组), 反推出当时的时间(数组)
  * year 年
  * eclipticLongitudes 黄经弧度数组
+ * 不论eclipticLongitudes有多少项，都只计算year年的数据，这个和 SolarLunarEclipticLongitudeDeltaToTimes 有区别
  */
-func (astro *Astronomy) SolarEclipticLongitudeToTime(year int, eclipticLongitudes []float64) ([]JulianDay, error) {
+func (astro *Astronomy) SolarEclipticLongitudesToTimes(year int, eclipticLongitudes []float64) ([]JulianDay, error) {
 	jd := DateToJulianDay(year, 1, 1, 0, 0, 0)
 	jdET := NewEphemerisTime(jd)
 
 	// 计算当年1月1日的黄经
 	planet, err := astro.PlanetProperties(swe.Sun, jdET)
-
 	if err != nil {
 		return nil, err
 	}
@@ -82,29 +82,47 @@ func (astro *Astronomy) SolarEclipticLongitudeToTime(year int, eclipticLongitude
 }
 
 /**
- * 该年的24节气的儒略日
+ * 该年的24节气的时间
  * year 年
  */
-func (astro *Astronomy) SolarTerms(year int) (solarTerms *[24]JulianDay, err error) {
+func (astro *Astronomy) SolarTerms(year int) ([]*JulianDayWithIndex, error) {
+	jd := DateToJulianDay(year, 1, 1, 0, 0, 0)
+	jdET := NewEphemerisTime(jd)
+	solarTerms := make([]*JulianDayWithIndex, 24)
 
-	solarTerms = &[24]JulianDay{}
+	// 15° 每个节气
+	degreePerSolarTerm := 15
+	// 1年24个节气
+	solarTermCount := 24
 
-	eclipticLongitudes := make([]float64, 24)
+	// 计算当年1月1日的黄经
+	planet, err := astro.PlanetProperties(swe.Sun, jdET)
+	if err != nil {
+		return nil, err
+	}
+
+	// 第一个有效的角度
+	firstValidLongDegree := NextMultiples(ToDegrees(planet.Ecliptic.Longitude), float64(degreePerSolarTerm))
+
+	// 24节气分别对应的黄经, 春分0开始
+	eclipticLongitudes := make([]float64, solarTermCount)
 	for i := 0; i < 24; i++ {
-		long := 15 * float64(i)
+		long := 15*float64(i) + firstValidLongDegree
+		solarTerms[i] = NewJulianDayWithIndex(0, int(long)/degreePerSolarTerm%solarTermCount)
 		eclipticLongitudes[i] = ToRadians(long)
 	}
 
-	times, err := astro.SolarEclipticLongitudeToTime(year, eclipticLongitudes)
+	times, err := astro.SolarEclipticLongitudesToTimes(year, eclipticLongitudes)
 
 	if err != nil {
 		return nil, err
 	}
 
 	for i, jd := range times {
-		solarTerms[i] = jd
+		// i 转化为节气的索引，春分是0
+		solarTerms[i].JdUT = jd
 	}
 
-	return
+	return solarTerms, nil
 
 }

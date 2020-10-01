@@ -13,6 +13,11 @@ type EphemerisTime struct {
 	DeltaT float64
 }
 
+type JulianDayWithIndex struct {
+	JdUT  JulianDay
+	Index int
+}
+
 const JD2000 JulianDay = 2451545.
 
 // time 转为 儒略日 JulianDay
@@ -66,6 +71,10 @@ func (et *EphemerisTime) Update(jdUT JulianDay) *EphemerisTime {
 	et.JdUT = jdUT
 	et.DeltaT = DeltaT(jdUT) //.DeltaT(float64(jdUT))
 	return et
+}
+
+func NewJulianDayWithIndex(jdUT JulianDay, index int) *JulianDayWithIndex {
+	return &JulianDayWithIndex{JdUT: jdUT, Index: index}
 }
 
 // Ephemeris time 天文历时

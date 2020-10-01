@@ -27,8 +27,23 @@ func main() {
 	if err != nil {
 		fmt.Printf("SolarTerms Error: %s", err.Error())
 	}
-	for i, jd := range solarTerms {
-		fmt.Printf("%s: %v\n", astro.SolarTermsString[i], jd.ToTime(nil).In(tz))
+
+	for _, jdi := range solarTerms {
+		if jdi != nil {
+			fmt.Printf("%s: %v\n", astro.SolarTermsString[jdi.Index], jdi.JdUT.ToTime(nil).In(tz))
+		}
+	}
+
+	// 月相
+	lunarPhases, err := astronomy.LunarPhases(year)
+	if err != nil {
+		fmt.Printf("LunarPhases Error: %s", err.Error())
+	}
+
+	for _, jdi := range lunarPhases {
+		if jdi != nil {
+			fmt.Printf("%s: %v\n", jdi.JdUT.ToTime(nil).In(tz), astro.LunarPhaseStrings[jdi.Index])
+		}
 	}
 
 	t := time.Date(year, month, day, 4, 0, 0, 0, time.UTC)

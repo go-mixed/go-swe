@@ -20,6 +20,8 @@ const (
 	ApparentLunarRadius        = LunarEarthRatio * EquatorialRadius * 1.0000036 * DegreeSecondsPerRadian  // 用于月亮视半径计算
 	ApparentLunarRadius2       = LunarEarthRatio2 * EquatorialRadius * 1.0000036 * DegreeSecondsPerRadian // 用于月亮视半径计算
 	ApparentSolarRadius        = 959.64                                                                   // 用于太阳视半径计算
+
+	MeanLunarDays = 29.530587981 // 平均农历月的日数
 )
 
 var SolarParallax = math.Asin(SinSolarParallax)                                      // 太阳视差

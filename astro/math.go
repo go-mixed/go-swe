@@ -19,8 +19,6 @@ const (
 	Radian180 float64 = math.Pi
 	// 360°的弧度
 	Radian360 float64 = math.Pi * 2
-	// 两个浮点数相等的最小差异
-	MinimumFloat float64 = 0.00000000001
 )
 
 const (
@@ -48,10 +46,11 @@ func RadiansMod360(r float64) float64 {
 // 对超过-PI到PI的角度转为-PI到PI, 即转化到-180°~180°
 func RadiansMod180(r float64) float64 {
 	_r := math.Mod(r, Radian360)
+	if _r > Radian180 {
+		_r -= Radian360
+	}
 	if _r < -Radian180 {
-		return _r + Radian360
-	} else if _r > Radian180 {
-		return _r - Radian360
+		_r += Radian360
 	}
 	return _r
 }
@@ -151,18 +150,18 @@ func Mod2(v, n float64) float64 {
 // NextMultiples(30, 15) = 30
 func NextMultiples(v, n float64) float64 {
 	c := v / n
-	i := math.Floor(c)     // 取两者的整数部分
-	d := c - math.Floor(c) // 取两者余数的小数部分
+	i := math.Floor(c) // 取两者的整数部分
+	d := c - i         // 取两者余数的小数部分
 
 	// 有余数
-	if d > MinimumFloat {
+	if !FloatEqual(d, 0, 9) {
 		i++
 	}
 
 	return n * i
 }
 
-// 求2个浮点数是否相等
-func FloatEqual(x, y float64) bool {
-	return math.Abs(x-y) < MinimumFloat
+// 求2个浮点数是否相等, scale 是对比小数位数
+func FloatEqual(x, y float64, scale int) bool {
+	return math.Abs(x-y) < (1 / math.Pow(10, float64(scale)))
 }
