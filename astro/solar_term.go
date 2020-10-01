@@ -53,10 +53,11 @@ func calcJulianDayBySolarEclipticLongitude(
 }
 
 /**
- * 该年的24节气的儒略日
+ * 指定太阳黄经(数组), 反推出当时的儒略日(数组)
  * year 年
+ * eclipticLongitudes 黄经弧度数组
  */
-func (astro *Astronomy) SolarTerms(year int) (solarTerms *[24]JulianDay, err error) {
+func (astro *Astronomy) SolarEclipticLongitudeToTime(year int, eclipticLongitudes []float64) ([]JulianDay, error) {
 	jd := DateToJulianDay(year, 1, 1, 0, 0, 0)
 	jdET := NewEphemerisTime(jd)
 
@@ -67,19 +68,41 @@ func (astro *Astronomy) SolarTerms(year int) (solarTerms *[24]JulianDay, err err
 		return nil, err
 	}
 
-	solarTerms = &[24]JulianDay{}
+	times := make([]JulianDay, len(eclipticLongitudes))
 
-	firstLong := ToDegrees(planet.Ecliptic.Longitude)
-	nextLong := NextMultiples(firstLong, 15) // 下一个整点的黄经
-
-	for i := 0; i < 24; i++ {
-		long := nextLong + 15*float64(i)
-		jd, err := calcJulianDayBySolarEclipticLongitude(astro, jdET, planet, ToRadians(long))
+	for i, angle := range eclipticLongitudes {
+		jd, err := calcJulianDayBySolarEclipticLongitude(astro, jdET, planet, angle)
 		if err != nil {
 			return nil, err
 		}
+		times[i] = jd
+	}
 
-		solarTerms[int(long/15)%24] = jd
+	return times, nil
+}
+
+/**
+ * 该年的24节气的儒略日
+ * year 年
+ */
+func (astro *Astronomy) SolarTerms(year int) (solarTerms *[24]JulianDay, err error) {
+
+	solarTerms = &[24]JulianDay{}
+
+	eclipticLongitudes := make([]float64, 24)
+	for i := 0; i < 24; i++ {
+		long := 15 * float64(i)
+		eclipticLongitudes[i] = ToRadians(long)
+	}
+
+	times, err := astro.SolarEclipticLongitudeToTime(year, eclipticLongitudes)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for i, jd := range times {
+		solarTerms[i] = jd
 	}
 
 	return
