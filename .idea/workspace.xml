@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1865da48-9c18-49b7-adf5-0858a817268c" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,7 +23,7 @@
   </component>
   <component name="GOROOT" path="D:\Compiler\go" />
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../go-swe" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
@@ -42,18 +44,18 @@
     <property name="configurable.Module.GOPATH.is.expanded" value="false" />
     <property name="configurable.Project.GOPATH.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/swe" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.goide.configuration.GoProjectSettingsConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\Codes\Applications\go\test\atro" />
-      <recent name="D:\Codes\Applications\go\test" />
-      <recent name="D:\Codes\Applications\go\test\swe" />
+      <recent name="D:\Codes\Applications\go\go-swe\atro" />
+      <recent name="D:\Codes\Applications\go\go-swe" />
+      <recent name="D:\Codes\Applications\go\go-swe\swe" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\Codes\Applications\go\test\swe" />
-      <recent name="D:\Codes\Applications\go\test" />
+      <recent name="D:\Codes\Applications\go\go-swe\swe" />
+      <recent name="D:\Codes\Applications\go\go-swe" />
     </key>
   </component>
   <component name="RunManager">
@@ -63,30 +65,19 @@
       <go_parameters value="-i" />
       <kind value="FILE" />
       <filePath value="$PROJECT_DIR$" />
-      <package value="test" />
+      <package value="go-swe" />
       <directory value="$PROJECT_DIR$" />
       <method v="2" />
     </configuration>
-    <configuration name="go build main" type="GoApplicationRunConfiguration" factoryName="Go Application">
-      <module name="go-swe" />
-      <working_directory value="$PROJECT_DIR$/../go-swe" />
-      <go_parameters value="-i" />
-      <kind value="DIRECTORY" />
-      <filePath value="$PROJECT_DIR$" />
-      <package value="test" />
-      <directory value="$PROJECT_DIR$/../go-swe" />
-      <output_directory value="$PROJECT_DIR$/../go-swe" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+    <configuration name="go build go-swe" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
       <module name="go-swe" />
       <working_directory value="$PROJECT_DIR$" />
       <go_parameters value="-i" />
-      <framework value="gotest" />
       <kind value="DIRECTORY" />
-      <package value="test" />
-      <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
+      <package value="go-swe" />
+      <directory value="$PROJECT_DIR$" />
+      <output_directory value="$PROJECT_DIR$" />
       <method v="2" />
     </configuration>
   </component>
@@ -98,10 +89,10 @@
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
-    <state x="518" y="311" width="1092" height="716" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1601221761750">
+    <state x="518" y="299" width="1092" height="741" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1601962453669">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="518" y="311" width="1092" height="716" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1601221761750" />
+    <state x="518" y="299" width="1092" height="741" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1601962453669" />
     <state x="698" y="320" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1601369483661">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
