@@ -15,9 +15,9 @@ var LunarDayStrings = [...]string{
 }
 
 /**
- * 太阳和月亮的黄经之差
+ * LunarSolarEclipticLongitudeDelta 月亮和太阳的黄经之差
  */
-func (astro *Astronomy) SolarLunarEclipticLongitudeDelta(jdET *EphemerisTime) (float64, error) {
+func (astro *Astronomy) LunarSolarEclipticLongitudeDelta(jdET *EphemerisTime) (float64, error) {
 	sun, err := astro.PlanetProperties(swe.Sun, jdET)
 	if err != nil {
 		return 0, err
@@ -32,15 +32,17 @@ func (astro *Astronomy) SolarLunarEclipticLongitudeDelta(jdET *EphemerisTime) (f
 }
 
 /**
- * eclipticLongitudeDelta 太阳和月球的黄经之差，比如 朔（0），上弦（90°），望（180°），下弦（270°）
+ * LunarSolarEclipticLongitudeDeltaToTime 从jdET开始，以月球和太阳的黄经之差求出具体时间，比如 朔（0），上弦（90°），望（180°），下弦（270°）
+ * jdET 以此时间开始
+ * eclipticLongitudeDelta 弧度
  */
-func (astro *Astronomy) SolarLunarEclipticLongitudeDeltaToTime(jdET *EphemerisTime, eclipticLongitudeDelta float64) (JulianDay, error) {
+func (astro *Astronomy) LunarSolarEclipticLongitudeDeltaToTime(jdET *EphemerisTime, eclipticLongitudeDelta float64) (JulianDay, error) {
 	eclipticLongitudeDelta = math.Abs(eclipticLongitudeDelta)
 
 	step := 27. * 0.125 // 4/1000,每次递进一小步
 	lastJdUT := jdET.JdUT
 
-	lastDelta, err := astro.SolarLunarEclipticLongitudeDelta(jdET)
+	lastDelta, err := astro.LunarSolarEclipticLongitudeDelta(jdET)
 	if err != nil {
 		return 0, err
 	}
@@ -57,7 +59,7 @@ func (astro *Astronomy) SolarLunarEclipticLongitudeDeltaToTime(jdET *EphemerisTi
 
 		// 渐步递增
 		lastJdUT = lastJdUT.Add(step)
-		lastDelta, err = astro.SolarLunarEclipticLongitudeDelta(NewEphemerisTime(lastJdUT))
+		lastDelta, err = astro.LunarSolarEclipticLongitudeDelta(NewEphemerisTime(lastJdUT))
 		if err != nil {
 			return 0, err
 		}
@@ -79,7 +81,7 @@ func (astro *Astronomy) SolarLunarEclipticLongitudeDeltaToTime(jdET *EphemerisTi
 
 		// 两日期的平均值
 		meanJdUT = (savedJdUT + lastJdUT) / 2.
-		lastDelta2, err := astro.SolarLunarEclipticLongitudeDelta(NewEphemerisTime(meanJdUT))
+		lastDelta2, err := astro.LunarSolarEclipticLongitudeDelta(NewEphemerisTime(meanJdUT))
 		if err != nil {
 			return 0, err
 		}
@@ -110,13 +112,13 @@ func (astro *Astronomy) SolarLunarEclipticLongitudeDeltaToTime(jdET *EphemerisTi
  * 比如(这里以度表示，实际应该是弧度)：{90, 180, 270, 0, 90} 表示startJdUT之后的{上弦，望，下弦，朔，上弦}。前面3个{上弦，望，下弦}是当前阴历月的, 最后2个{朔，上弦}是下个阴历月的
  * 也就是说可以计算多个月的，下面的 LunarPhases，使用本函数一次计算了1年
  */
-func (astro *Astronomy) SolarLunarEclipticLongitudeDeltaToTimes(startJdUT JulianDay, eclipticLongitudeDelta []float64) ([]JulianDay, error) {
+func (astro *Astronomy) LunarSolarEclipticLongitudeDeltaToTimes(startJdUT JulianDay, eclipticLongitudeDelta []float64) ([]JulianDay, error) {
 	times := make([]JulianDay, len(eclipticLongitudeDelta))
 
 	var jd = startJdUT
 	var err error
 	for i, delta := range eclipticLongitudeDelta {
-		jd, err = astro.SolarLunarEclipticLongitudeDeltaToTime(NewEphemerisTime(jd), ToRadians(delta))
+		jd, err = astro.LunarSolarEclipticLongitudeDeltaToTime(NewEphemerisTime(jd), ToRadians(delta))
 		if err != nil {
 			return nil, err
 		}
@@ -138,7 +140,7 @@ func (astro *Astronomy) LunarPhases(year int) ([]*JulianDayWithIndex, error) {
 	//
 	jdUT := DateToJulianDay(year, 1, 1, 0, 0, 0)
 	nextYear := jdUT.AddYears(1)
-	firstLongDelta, err := astro.SolarLunarEclipticLongitudeDelta(NewEphemerisTime(jdUT))
+	firstLongDelta, err := astro.LunarSolarEclipticLongitudeDelta(NewEphemerisTime(jdUT))
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +159,7 @@ func (astro *Astronomy) LunarPhases(year int) ([]*JulianDayWithIndex, error) {
 	}
 
 	// 运算
-	times, err := astro.SolarLunarEclipticLongitudeDeltaToTimes(jdUT, eclipticLongitudeDelta)
+	times, err := astro.LunarSolarEclipticLongitudeDeltaToTimes(jdUT, eclipticLongitudeDelta)
 	if err != nil {
 		return nil, err
 	}

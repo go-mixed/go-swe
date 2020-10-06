@@ -56,7 +56,7 @@ func calcJulianDayBySolarEclipticLongitude(
  * 指定太阳黄经(数组), 反推出当时的时间(数组)
  * year 年
  * eclipticLongitudes 黄经弧度数组
- * 不论eclipticLongitudes有多少项，都只计算year年的数据，这个和 SolarLunarEclipticLongitudeDeltaToTimes 有区别
+ * 不论eclipticLongitudes有多少项，都只计算year年的数据，这个和 LunarSolarEclipticLongitudeDeltaToTimes 有区别
  */
 func (astro *Astronomy) SolarEclipticLongitudesToTimes(year int, eclipticLongitudes []float64) ([]JulianDay, error) {
 	jd := DateToJulianDay(year, 1, 1, 0, 0, 0)
