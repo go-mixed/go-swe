@@ -7,7 +7,7 @@ import (
 
 const (
 	EquatorialRadius           = 6378.1366                                                                // 地球赤道半径(千米)
-	MeanEquatorialRadius       = 0.99834 * EquatorialRadius                                               //平均半径
+	MeanEquatorialRadius       = 0.99834 * EquatorialRadius                                               // 平均半径
 	PolarEquatorialRatio       = 0.99664719                                                               // 地球极赤半径比
 	PolarEquatorialRatioSquare = PolarEquatorialRatio * PolarEquatorialRatio                              // 地球极赤半径比的平方
 	AU                         = 1.49597870691e8                                                          // 天文单位长度(千米)
@@ -22,6 +22,7 @@ const (
 	ApparentSolarRadius        = 959.64                                                                   // 用于太阳视半径计算
 
 	MeanLunarDays = 29.530587981 // 平均农历月的日数
+	MeanSolarDays = 365.2425     // 平均太阳年的日数
 )
 
 var SolarParallax = math.Asin(SinSolarParallax)                                      // 太阳视差

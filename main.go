@@ -28,10 +28,8 @@ func main() {
 		fmt.Printf("SolarTerms Error: %s", err.Error())
 	}
 
-	for _, jdi := range solarTerms {
-		if jdi != nil {
-			fmt.Printf("%s: %v\n", astro.SolarTermsString[jdi.Index], jdi.JdUT.ToTime(nil).In(tz))
-		}
+	for _, jdExtra := range solarTerms {
+		fmt.Printf("%s: %v\n", astro.SolarTermsString[jdExtra.Integer], jdExtra.JdUT.ToTime(nil).In(tz))
 	}
 
 	// 月相
@@ -40,16 +38,25 @@ func main() {
 		fmt.Printf("LunarPhases Error: %s", err.Error())
 	}
 
-	for _, jdi := range lunarPhases {
-		if jdi != nil {
-			fmt.Printf("%s: %v\n", jdi.JdUT.ToTime(nil).In(tz), astro.LunarPhaseStrings[jdi.Index])
-		}
+	for _, jdExtra := range lunarPhases {
+		fmt.Printf("%s: %v\n", jdExtra.JdUT.ToTime(nil).In(tz), astro.LunarPhaseStrings[jdExtra.Integer])
 	}
 
+	// 农历月
+	lunarMonths, err := astronomy.LunarMonths(year)
+	if err != nil {
+		fmt.Printf("LunarMonths Error: %s\n", err.Error())
+	}
+
+	for _, lunarMonth := range lunarMonths {
+		fmt.Printf("%s: %v %d\n", lunarMonth.JdUT.ToTime(nil).In(tz), astro.GetLunarMonthString(lunarMonth.Index, lunarMonth.Leap), lunarMonth.Days)
+	}
+
+	// 东八区的正午是UTC的4点
 	t := time.Date(year, month, day, 4, 0, 0, 0, time.UTC)
 	jd := astro.TimeToJulianDay(t)
 	deltaT := astro.DeltaT(jd)
-	et := jd.ToEphemerisTime(deltaT)
+	et := jd.Add(deltaT)
 	etT := et.ToTime(time.UTC)
 	fmt.Printf("JD: %f at %v \n", jd, jd.ToTime(time.UTC))
 	fmt.Printf("ET: %f at %v deltaT: %v\n", et, etT, deltaT)

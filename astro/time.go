@@ -13,12 +13,13 @@ type EphemerisTime struct {
 	DeltaT float64
 }
 
-type JulianDayWithIndex struct {
-	JdUT  JulianDay
-	Index int
+type JulianDayExtra struct {
+	JdUT    JulianDay
+	Integer int
 }
 
 const JD2000 JulianDay = 2451545.
+const JD_CST_OFFSET = 8. / 24.
 
 // time 转为 儒略日 JulianDay
 // 如果需要UT的儒略，需自行转换，如：_time.UTC()
@@ -64,7 +65,7 @@ func NewEphemerisTime(jdUT JulianDay) *EphemerisTime {
 }
 
 func (et *EphemerisTime) Value() float64 {
-	return float64(et.JdUT.ToEphemerisTime(et.DeltaT))
+	return float64(et.JdUT.Add(et.DeltaT))
 }
 
 func (et *EphemerisTime) Update(jdUT JulianDay) *EphemerisTime {
@@ -73,8 +74,8 @@ func (et *EphemerisTime) Update(jdUT JulianDay) *EphemerisTime {
 	return et
 }
 
-func NewJulianDayWithIndex(jdUT JulianDay, index int) *JulianDayWithIndex {
-	return &JulianDayWithIndex{JdUT: jdUT, Index: index}
+func NewJulianDayExtra(jdUT JulianDay, index int) *JulianDayExtra {
+	return &JulianDayExtra{JdUT: jdUT, Integer: index}
 }
 
 // Ephemeris time 天文历时
@@ -86,14 +87,9 @@ func (jd JulianDay) ToTime(local *time.Location) time.Time {
 	return time.Date(year, time.Month(month), day, hour, minute, int(second), int((second-float64(int(second)))*1e9), local)
 }
 
-// JD 转 Ephemeris time 天文历时的儒略日
-func (jd JulianDay) ToEphemerisTime(deltaT float64) JulianDay {
-	return jd.Add(deltaT)
-}
-
-// Ephemeris time 转 JD
-func (jd JulianDay) FromEphemerisTime(deltaT float64) JulianDay {
-	return jd.Add(-deltaT)
+// JD UT 转 CST
+func (jd JulianDay) ToCST() JulianDay {
+	return jd.Add(JD_CST_OFFSET)
 }
 
 // 转换为JD2000的表示方式
@@ -200,7 +196,7 @@ func (jd JulianDay) EndOfYear() JulianDay {
 // 格林尼治平恒星时(不含赤经章动及非多项式部分),即格林尼治子午圈的平春分点起算的赤经
 func GreenwichMeridianSiderealTime(jdUT JulianDay, deltaT float64) float64 {
 	//t是力学时(世纪数)
-	t := float64(jdUT.ToEphemerisTime(deltaT).AsJD2000()) / 36525.
+	t := float64(jdUT.Add(deltaT).AsJD2000()) / 36525.
 	t2 := t * t
 	t3 := t2 * t
 	t4 := t3 * t
