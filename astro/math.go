@@ -37,6 +37,11 @@ func ToDegrees(r float64) float64 {
 func RadiansMod360(r float64) float64 {
 	_r := math.Mod(r, Radian360)
 
+	// 接近0
+	if FloatEqual(_r, 0, 9) {
+		return _r
+	}
+
 	if _r < 0 {
 		return _r + Radian360
 	}
@@ -46,6 +51,12 @@ func RadiansMod360(r float64) float64 {
 // 对超过-PI到PI的角度转为-PI到PI, 即转化到-180°~180°
 func RadiansMod180(r float64) float64 {
 	_r := math.Mod(r, Radian360)
+
+	// 接近180°
+	if FloatEqual(math.Abs(_r), Radian180, 9) {
+		return _r
+	}
+
 	if _r > Radian180 {
 		_r -= Radian360
 	}

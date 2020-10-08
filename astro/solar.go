@@ -39,9 +39,9 @@ func calcJulianDayBySolarEclipticLongitude(
 		}
 
 		// 黄经速度 单位是天
-		delta := (_eclipticLongitudeDelta - _lastLongDelta) / _lastPlanet.SpeedInLongitude
+		dayDelta := (_eclipticLongitudeDelta - _lastLongDelta) / _lastPlanet.SpeedInLongitude
 
-		_jd = _jd.Add(delta)
+		_jd = _jd.Add(dayDelta)
 
 		var err error
 		_lastPlanet, err = astro.PlanetProperties(_lastPlanet.PlanetId, NewEphemerisTime(_jd))
@@ -95,9 +95,13 @@ func (astro *Astronomy) SolarEclipticLongitudesToTimes(startJdUT JulianDay, ecli
 
 	lastAngle := math.Inf(-1)
 	for i, angle := range eclipticLongitudes {
-		// 如果上一个弧度差和现在的相等，为了避免SolarEclipticLongitudesToTime不往后面推进，jd累加半年
+		// 如果上一个弧度差和现在的相等，为了避免SolarEclipticLongitudesToTime不往后面推进，jd累加半年、planet重新计算
 		if FloatEqual(angle, lastAngle, 9) {
-			jd += MeanSolarDays / 2
+			jd += MeanSolarDays * .8
+			planet, err = astro.PlanetProperties(swe.Sun, NewEphemerisTime(jd))
+			if err != nil {
+				return nil, fmt.Errorf("SolarEclipticLongitudesToTimes Calc 3: %w", err)
+			}
 		}
 		jd, planet, _, err = calcJulianDayBySolarEclipticLongitude(astro, NewEphemerisTime(jd), planet, angle)
 		if err != nil {

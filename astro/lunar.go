@@ -25,24 +25,25 @@ func GetLunarMonthString(index int, leap bool) string {
 /**
  * LunarSolarEclipticLongitudeDelta 月亮和太阳的黄经之差
  */
-func (astro *Astronomy) LunarSolarEclipticLongitudeDelta(jdET *EphemerisTime) (float64, error) {
+func (astro *Astronomy) LunarSolarEclipticLongitudeDelta(jdET *EphemerisTime) (float64, float64, error) {
 	sun, err := astro.PlanetProperties(swe.Sun, jdET)
 	if err != nil {
-		return 0, fmt.Errorf("LunarSolarEclipticLongitudeDelta of Sun: %w", err)
+		return 0, 0, fmt.Errorf("LunarSolarEclipticLongitudeDelta of Sun: %w", err)
 	}
 
 	moon, err := astro.PlanetProperties(swe.Moon, jdET)
 	if err != nil {
-		return 0, fmt.Errorf("LunarSolarEclipticLongitudeDelta of Moon: %w", err)
+		return 0, 0, fmt.Errorf("LunarSolarEclipticLongitudeDelta of Moon: %w", err)
 	}
 
-	return moon.Ecliptic.Longitude - sun.Ecliptic.Longitude, nil
+	return moon.Ecliptic.Longitude - sun.Ecliptic.Longitude, moon.SpeedInLongitude - sun.SpeedInLongitude, nil
 }
 
 /**
  * LunarSolarEclipticLongitudeDeltaToTime 从jdET开始，以月球和太阳的黄经之差求出具体时间，比如 朔（0），上弦（90°），望（180°），下弦（270°）
  * jdET 以此时间开始
  * eclipticLongitudeDelta 弧差
+ * precision 是否更加精确的计算，精确计算会比较耗时
  */
 func (astro *Astronomy) LunarSolarEclipticLongitudeDeltaToTime(jdET *EphemerisTime, eclipticLongitudeDelta float64) (JulianDay, int, error) {
 	eclipticLongitudeDelta = math.Abs(eclipticLongitudeDelta)
@@ -50,79 +51,105 @@ func (astro *Astronomy) LunarSolarEclipticLongitudeDeltaToTime(jdET *EphemerisTi
 	const step = 27. * 0.125 // 4/1000,每次递进一小步
 	lastJdUT := jdET.JdUT
 
-	lastDelta, err := astro.LunarSolarEclipticLongitudeDelta(jdET)
+	lastDelta, lastSpeedDelta, err := astro.LunarSolarEclipticLongitudeDelta(jdET)
 	if err != nil {
 		return 0, 0, fmt.Errorf("LunarSolarEclipticLongitudeDeltaToTime Calc 1: %w", err)
 	}
 
 	calcCount := 0
 
-	// 已经相等了，说明传入的时间即当时的弧差
-	if FloatEqual(lastDelta, eclipticLongitudeDelta, 9) {
-		return lastJdUT, calcCount, nil
+	if true {
+		var firstDelta = lastDelta
+		var eclipticLongitudeDeltaDelta = RadiansMod360(eclipticLongitudeDelta - firstDelta)
+		var lastDeltaDelta = 0.
+		for {
+			if FloatEqual(lastDeltaDelta, eclipticLongitudeDeltaDelta, 9) {
+				return lastJdUT, calcCount, nil
+			}
+
+			// 黄经速度 单位是天
+			dayDelta := (eclipticLongitudeDeltaDelta - lastDeltaDelta) / lastSpeedDelta
+
+			lastJdUT = lastJdUT.Add(dayDelta)
+
+			lastDelta, lastSpeedDelta, err = astro.LunarSolarEclipticLongitudeDelta(NewEphemerisTime(lastJdUT))
+			if err != nil {
+				return 0, 0, fmt.Errorf("LunarSolarEclipticLongitudeDeltaToTime Calc 2: %w", err)
+			}
+
+			lastDeltaDelta = RadiansMod360(lastDelta - firstDelta)
+			calcCount++
+		}
+	} else {
+		// 已经相等了，说明传入的时间即当时的弧差
+		if FloatEqual(lastDelta, eclipticLongitudeDelta, 9) {
+			return lastJdUT, calcCount, nil
+		}
+
+		// 取当前 黄经差 与 所需黄经差 的 差值
+		lastDeltaDelta := RadiansMod180(lastDelta - eclipticLongitudeDelta)
+
+		var savedJdUT, meanJdUT JulianDay
+		var savedDelta, savedDeltaDelta float64
+		for {
+			savedJdUT = lastJdUT
+			savedDelta = lastDelta
+			savedDeltaDelta = lastDeltaDelta
+
+			// 渐步递增
+			lastJdUT = lastJdUT.Add(step)
+			lastDelta, lastSpeedDelta, err = astro.LunarSolarEclipticLongitudeDelta(NewEphemerisTime(lastJdUT))
+			if err != nil {
+				return 0, calcCount, fmt.Errorf("LunarSolarEclipticLongitudeDeltaToTime Calc 2: %w", err)
+			}
+			lastDeltaDelta = RadiansMod180(lastDelta - eclipticLongitudeDelta)
+
+			calcCount++
+
+			// Keep searching while error is large.
+			if math.Abs(lastDeltaDelta) > Radian90 {
+				continue
+			}
+
+			// 这两个的正负不同，说明最后一次计算超过了正确值，获取上一次saved的结果
+			if !SameSign(savedDeltaDelta, lastDeltaDelta) {
+				break
+			}
+		}
+
+		// 利用JD平均数来缩小差距，二分法
+		for !FloatEqual(float64(lastJdUT), float64(savedJdUT), 6) {
+
+			// 两日期的平均值
+			meanJdUT = (savedJdUT + lastJdUT) / 2.
+			var lastDelta2 float64
+			lastDelta2, lastSpeedDelta, err = astro.LunarSolarEclipticLongitudeDelta(NewEphemerisTime(meanJdUT))
+			if err != nil {
+				return 0, calcCount, fmt.Errorf("LunarSolarEclipticLongitudeDeltaToTime Calc 3: %w", err)
+			}
+			// 求两"差"之差
+			lastDeltaDelta2 := RadiansMod180(lastDelta2 - eclipticLongitudeDelta)
+
+			// 符号相同
+			if SameSign(lastDeltaDelta2, lastDeltaDelta) {
+				lastDelta = lastDelta2
+				lastJdUT = meanJdUT
+				lastDeltaDelta = lastDeltaDelta2
+			} else {
+				savedDelta = lastDelta2
+				savedJdUT = meanJdUT
+				savedDeltaDelta = lastDeltaDelta2
+			}
+
+			calcCount++
+
+		}
+
+		meanJdUT = savedJdUT.Add(float64(lastJdUT-savedJdUT) * -savedDeltaDelta / (lastDelta - savedDelta))
+
+		return meanJdUT, calcCount, nil
 	}
 
-	// 取当前 黄经差 与 所需黄经差 的 差值
-	lastDeltaDelta := RadiansMod180(lastDelta - eclipticLongitudeDelta)
-
-	var savedJdUT, meanJdUT JulianDay
-	var savedDelta, savedDeltaDelta float64
-	for {
-		savedJdUT = lastJdUT
-		savedDelta = lastDelta
-		savedDeltaDelta = lastDeltaDelta
-
-		// 渐步递增
-		lastJdUT = lastJdUT.Add(step)
-		lastDelta, err = astro.LunarSolarEclipticLongitudeDelta(NewEphemerisTime(lastJdUT))
-		if err != nil {
-			return 0, calcCount, fmt.Errorf("LunarSolarEclipticLongitudeDeltaToTime Calc 2: %w", err)
-		}
-		lastDeltaDelta = RadiansMod180(lastDelta - eclipticLongitudeDelta)
-
-		calcCount++
-
-		// Keep searching while error is large.
-		if math.Abs(lastDeltaDelta) > Radian90 {
-			continue
-		}
-
-		// 这两个的正负不同，说明最后一次计算超过了正确值，获取上一次saved的结果
-		if !SameSign(savedDeltaDelta, lastDeltaDelta) {
-			break
-		}
-	}
-
-	// 利用JD平均数来缩小差距，二分法
-	for !FloatEqual(float64(lastJdUT), float64(savedJdUT), 6) {
-
-		// 两日期的平均值
-		meanJdUT = (savedJdUT + lastJdUT) / 2.
-		lastDelta2, err := astro.LunarSolarEclipticLongitudeDelta(NewEphemerisTime(meanJdUT))
-		if err != nil {
-			return 0, calcCount, fmt.Errorf("LunarSolarEclipticLongitudeDeltaToTime Calc 3: %w", err)
-		}
-		// 求两"差"之差
-		lastDeltaDelta2 := RadiansMod180(lastDelta2 - eclipticLongitudeDelta)
-
-		// 符号相同
-		if SameSign(lastDeltaDelta2, lastDeltaDelta) {
-			lastDelta = lastDelta2
-			lastJdUT = meanJdUT
-			lastDeltaDelta = lastDeltaDelta2
-		} else {
-			savedDelta = lastDelta2
-			savedJdUT = meanJdUT
-			savedDeltaDelta = lastDeltaDelta2
-		}
-
-		calcCount++
-
-	}
-
-	meanJdUT = savedJdUT.Add(float64(lastJdUT-savedJdUT) * -savedDeltaDelta / (lastDelta - savedDelta))
-
-	return meanJdUT, calcCount, nil
 }
 
 /**
@@ -165,7 +192,7 @@ func (astro *Astronomy) LunarPhasesRange(startJdUT, endJdUT JulianDay) ([]*Julia
 
 	// 90° 每个节气
 	const degreePerLunarPhases = 90
-	firstLongDelta, err := astro.LunarSolarEclipticLongitudeDelta(NewEphemerisTime(startJdUT))
+	firstLongDelta, _, err := astro.LunarSolarEclipticLongitudeDelta(NewEphemerisTime(startJdUT))
 	if err != nil {
 		return nil, fmt.Errorf("LunarPhases Calc 1: %w", err)
 	}
@@ -236,7 +263,7 @@ func (astro *Astronomy) NewMoons(startJdUT JulianDay, count int) ([]JulianDay, e
  * startJdUT 起始时间
  */
 func (astro *Astronomy) LastNewMoons(startJdUT JulianDay) (JulianDay, error) {
-	times, err := astro.NewMoons(startJdUT-MeanLunarDays*2, 4)
+	times, err := astro.NewMoons(startJdUT-MeanLunarDays*1.5, 3)
 	if err != nil {
 		return 0, fmt.Errorf("LastNewMoons: %w", err)
 	}

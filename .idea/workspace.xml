@@ -22,12 +22,12 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1865da48-9c18-49b7-adf5-0858a817268c" name="Default Changelist" comment="add lunar calendar">
+    <list default="true" id="1865da48-9c18-49b7-adf5-0858a817268c" name="Default Changelist" comment="add SameSign&#10;add calcCount to solar,lunar">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/astro/calendar.go" beforeDir="false" afterPath="$PROJECT_DIR$/astro/calendar.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/astro/lunar.go" beforeDir="false" afterPath="$PROJECT_DIR$/astro/lunar.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/astro/math.go" beforeDir="false" afterPath="$PROJECT_DIR$/astro/math.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/astro/solar.go" beforeDir="false" afterPath="$PROJECT_DIR$/astro/solar.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,7 +118,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="add lunar calendar" />
-    <option name="LAST_COMMIT_MESSAGE" value="add lunar calendar" />
+    <MESSAGE value="add SameSign&#10;add calcCount to solar,lunar" />
+    <option name="LAST_COMMIT_MESSAGE" value="add SameSign&#10;add calcCount to solar,lunar" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -140,38 +141,38 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="740" y="274" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1601182535629" />
-    <state width="1877" height="266" key="GridCell.Tab.0.bottom" timestamp="1602163356933">
+    <state width="1877" height="348" key="GridCell.Tab.0.bottom" timestamp="1602169488868">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="266" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1602163356933" />
-    <state width="1877" height="266" key="GridCell.Tab.0.center" timestamp="1602163356933">
+    <state width="1877" height="348" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488868" />
+    <state width="1877" height="348" key="GridCell.Tab.0.center" timestamp="1602169488868">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="266" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1602163356933" />
-    <state width="1877" height="266" key="GridCell.Tab.0.left" timestamp="1602163356933">
+    <state width="1877" height="348" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488868" />
+    <state width="1877" height="348" key="GridCell.Tab.0.left" timestamp="1602169488867">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="266" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1602163356933" />
-    <state width="1877" height="266" key="GridCell.Tab.0.right" timestamp="1602163356933">
+    <state width="1877" height="348" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488867" />
+    <state width="1877" height="348" key="GridCell.Tab.0.right" timestamp="1602169488868">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="266" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1602163356933" />
-    <state width="1877" height="348" key="GridCell.Tab.1.bottom" timestamp="1602081171601">
+    <state width="1877" height="348" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488868" />
+    <state width="1877" height="348" key="GridCell.Tab.1.bottom" timestamp="1602169488868">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1602081171601" />
-    <state width="1877" height="348" key="GridCell.Tab.1.center" timestamp="1602081171601">
+    <state width="1877" height="348" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488868" />
+    <state width="1877" height="348" key="GridCell.Tab.1.center" timestamp="1602169488868">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1602081171601" />
-    <state width="1877" height="348" key="GridCell.Tab.1.left" timestamp="1602081171601">
+    <state width="1877" height="348" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488868" />
+    <state width="1877" height="348" key="GridCell.Tab.1.left" timestamp="1602169488868">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1602081171601" />
-    <state width="1877" height="348" key="GridCell.Tab.1.right" timestamp="1602081171601">
+    <state width="1877" height="348" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488868" />
+    <state width="1877" height="348" key="GridCell.Tab.1.right" timestamp="1602169488868">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1602081171601" />
+    <state width="1877" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488868" />
     <state x="461" y="164" key="SettingsEditor" timestamp="1601221774930">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -207,6 +208,7 @@
     <watches-manager>
       <configuration name="GoApplicationRunConfiguration">
         <watch expression="nextNewMoon.ToTime(nil)" language="go" />
+        <watch expression="winterSolstices[0].ToTime(nil)" language="go" />
       </configuration>
     </watches-manager>
   </component>
