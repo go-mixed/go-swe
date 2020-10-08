@@ -165,3 +165,8 @@ func NextMultiples(v, n float64) float64 {
 func FloatEqual(x, y float64, scale int) bool {
 	return math.Abs(x-y) < (1 / math.Pow(10, float64(scale)))
 }
+
+// 两个浮点数是否正负相同
+func SameSign(x, y float64) bool {
+	return (x < 0) == (y < 0)
+}

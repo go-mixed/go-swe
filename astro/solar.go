@@ -20,9 +20,9 @@ func calcJulianDayBySolarEclipticLongitude(
 	astro *Astronomy,
 	startJdET *EphemerisTime,
 	startPlanet *PlanetProperties,
-	eclipticLongitude float64) (_jd JulianDay, err error) {
+	eclipticLongitude float64) (JulianDay, *PlanetProperties, int, error) {
 
-	_jd = startJdET.JdUT
+	_jd := startJdET.JdUT
 	_lastPlanet := startPlanet
 	// 将1月1日正午设置为相对0rad，这种算法可以简化当前黄经已经越过360°之后从0开始，而lastLong还在360°内，导致时间差异360多天的情况
 	_startLong := startPlanet.Ecliptic.Longitude
@@ -31,10 +31,11 @@ func calcJulianDayBySolarEclipticLongitude(
 	// 目标黄经相对首日黄经的差值 并换算到360°内
 	_eclipticLongitudeDelta := RadiansMod360(eclipticLongitude - _startLong)
 
+	calcCount := 0
 	for {
 		// 已经到了目标黄经, 返回结果
 		if FloatEqual(_eclipticLongitudeDelta, _lastLongDelta, 9) {
-			return _jd, nil
+			return _jd, _lastPlanet, calcCount, nil
 		}
 
 		// 黄经速度 单位是天
@@ -42,13 +43,15 @@ func calcJulianDayBySolarEclipticLongitude(
 
 		_jd = _jd.Add(delta)
 
+		var err error
 		_lastPlanet, err = astro.PlanetProperties(_lastPlanet.PlanetId, NewEphemerisTime(_jd))
 		if err != nil {
-			return 0, fmt.Errorf("calcJulianDayBySolarEclipticLongitude: %w", err)
+			return 0, nil, calcCount, fmt.Errorf("calcJulianDayBySolarEclipticLongitude: %w", err)
 		}
 
 		// 当前黄经相对首日黄经的差值 并换算到360°内
 		_lastLongDelta = RadiansMod360(_lastPlanet.Ecliptic.Longitude - _startLong)
+		calcCount++
 	}
 
 }
@@ -58,20 +61,20 @@ func calcJulianDayBySolarEclipticLongitude(
  * startJdUT 时间起始
  * eclipticLongitude 黄经弧度
  */
-func (astro *Astronomy) SolarEclipticLongitudesToTime(startJdUT JulianDay, eclipticLongitude float64) (JulianDay, error) {
+func (astro *Astronomy) SolarEclipticLongitudesToTime(startJdUT JulianDay, eclipticLongitude float64) (JulianDay, int, error) {
 	jdET := NewEphemerisTime(startJdUT)
 
 	// startJd的黄经
 	planet, err := astro.PlanetProperties(swe.Sun, jdET)
 	if err != nil {
-		return 0, fmt.Errorf("SolarEclipticLongitudesToTime Calc 1: %w", err)
+		return 0, 0, fmt.Errorf("SolarEclipticLongitudesToTime Calc 1: %w", err)
 	}
 
-	jd, err := calcJulianDayBySolarEclipticLongitude(astro, jdET, planet, eclipticLongitude)
+	jd, planet, calcCount, err := calcJulianDayBySolarEclipticLongitude(astro, jdET, planet, eclipticLongitude)
 	if err != nil {
-		return 0, fmt.Errorf("SolarEclipticLongitudesToTime Calc 2: %w", err)
+		return 0, 0, fmt.Errorf("SolarEclipticLongitudesToTime Calc 2: %w", err)
 	}
-	return jd, nil
+	return jd, calcCount, nil
 }
 
 /**
@@ -84,19 +87,19 @@ func (astro *Astronomy) SolarEclipticLongitudesToTimes(startJdUT JulianDay, ecli
 
 	times := make([]JulianDay, len(eclipticLongitudes))
 	var jd = startJdUT
+
+	planet, err := astro.PlanetProperties(swe.Sun, NewEphemerisTime(jd))
+	if err != nil {
+		return nil, fmt.Errorf("SolarEclipticLongitudesToTimes Calc 1: %w", err)
+	}
+
 	lastAngle := math.Inf(-1)
 	for i, angle := range eclipticLongitudes {
 		// 如果上一个弧度差和现在的相等，为了避免SolarEclipticLongitudesToTime不往后面推进，jd累加半年
 		if FloatEqual(angle, lastAngle, 9) {
 			jd += MeanSolarDays / 2
 		}
-
-		planet, err := astro.PlanetProperties(swe.Sun, NewEphemerisTime(jd))
-		if err != nil {
-			return nil, fmt.Errorf("SolarEclipticLongitudesToTimes Calc 1: %w", err)
-		}
-
-		jd, err = calcJulianDayBySolarEclipticLongitude(astro, NewEphemerisTime(jd), planet, angle)
+		jd, planet, _, err = calcJulianDayBySolarEclipticLongitude(astro, NewEphemerisTime(jd), planet, angle)
 		if err != nil {
 			return nil, fmt.Errorf("SolarEclipticLongitudesToTimes Calc 2: %w", err)
 		}
@@ -131,7 +134,7 @@ func (astro *Astronomy) SolarTermsRange(startJdUT, endJdUT JulianDay) ([]*Julian
 
 	var jd = startJdUT
 	for ; jd <= endJdUT; long += degreePerSolarTerm {
-		jd, err = astro.SolarEclipticLongitudesToTime(jd, ToRadians(long))
+		jd, _, err = astro.SolarEclipticLongitudesToTime(jd, ToRadians(long))
 		if err != nil {
 			return nil, fmt.Errorf("SolarTerms Calc 2: %w", err)
 		}
