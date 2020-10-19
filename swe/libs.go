@@ -31,7 +31,8 @@ package swe
 // #cgo CFLAGS: -DTRACE_CLOSE=1
 
 #cgo CFLAGS: -w
-#cgo LDFLAGS: -L${SRCDIR}/../ -lswe
+#cgo windows LDFLAGS: -L${SRCDIR}/.. -lswe
+#cgo linux LDFLAGS: -lm -lc -L${SRCDIR}/.. -lswe
 
 #include <stdint.h>
 #include "swephexp.h"
