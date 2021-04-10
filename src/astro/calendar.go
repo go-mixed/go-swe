@@ -7,13 +7,13 @@ import (
 
 type LunarMonth struct {
 	// 朔时间
-	JdUT JulianDay
+	JdUT JulianDay `json:"jd_ut"`
 	// 第几个月
-	Index int
+	Index int `json:"index"`
 	// 该月有多少天
-	Days int
+	Days int `json:"days"`
 	// 是否是闰月
-	Leap bool
+	Leap bool `json:"leap"`
 }
 
 /**
@@ -37,7 +37,7 @@ func (astro *Astronomy) LunarMonths(year int) ([]*LunarMonth, error) {
 		return nil, fmt.Errorf("LunarMonths NextNewMoon: %w", err)
 	}
 	// 从去年冬至日之前的朔日, 推14个月
-	newMoons, err := astro.NewMoons(lastNewMoon, 14)
+	newMoons, err := astro.NextNewMoons(lastNewMoon, 14)
 	if err != nil {
 		return nil, fmt.Errorf("LunarMonths NewMoons: %w", err)
 	}
@@ -59,7 +59,7 @@ func (astro *Astronomy) LunarMonths(year int) ([]*LunarMonth, error) {
 			if cst >= start && cst < end {
 				// 雨水、春分、谷雨、小满、夏至、大暑、处暑、秋分、霜降、小雪、冬至和大寒
 				// 也就是可以整除2的
-				if jdExtra.Integer%2 == 0 {
+				if jdExtra.Index%2 == 0 {
 					return true
 				}
 			}

@@ -1,7 +1,7 @@
 package astro
 
 import (
-	"go-swe/swe"
+	"go-swe/src/swe"
 	"math"
 	"time"
 )
@@ -9,13 +9,13 @@ import (
 type JulianDay float64
 
 type EphemerisTime struct {
-	JdUT   JulianDay
-	DeltaT float64
+	JdUT   JulianDay `json:"jd_ut"`
+	DeltaT float64   `json:"delta_t"`
 }
 
 type JulianDayExtra struct {
-	JdUT    JulianDay
-	Integer int
+	JdUT  JulianDay `json:"jd_ut"`
+	Index int       `json:"index"`
 }
 
 const JD2000 JulianDay = 2451545.
@@ -75,7 +75,7 @@ func (et *EphemerisTime) Update(jdUT JulianDay) *EphemerisTime {
 }
 
 func NewJulianDayExtra(jdUT JulianDay, index int) *JulianDayExtra {
-	return &JulianDayExtra{JdUT: jdUT, Integer: index}
+	return &JulianDayExtra{JdUT: jdUT, Index: index}
 }
 
 // Ephemeris time 天文历时
@@ -111,7 +111,7 @@ func (jd JulianDay) AddYears(years int) JulianDay {
 	return JulianDay(_jd)
 }
 
-// 增加N年，减少用负数
+// 增加N月，减少用负数
 // 注意：大部分日历操作类都存在这个问题 2000-03-31 - 1 month -> 2000-03-02
 func (jd JulianDay) AddMonths(months int) JulianDay {
 	y, m, d, t, _ := swe.NewSwe().RevJul(float64(jd), swe.Gregorian)
@@ -194,6 +194,7 @@ func (jd JulianDay) EndOfYear() JulianDay {
 }
 
 // 格林尼治平恒星时(不含赤经章动及非多项式部分),即格林尼治子午圈的平春分点起算的赤经
+// 可以使用 astro.Swe.SidTime 精确计算
 func GreenwichMeridianSiderealTime(jdUT JulianDay, deltaT float64) float64 {
 	//t是力学时(世纪数)
 	t := float64(jdUT.Add(deltaT).AsJD2000()) / 36525.
@@ -266,6 +267,7 @@ func dtCalc(y float64) float64 {
 
 /**
  * 计算UT 和 ET 的 DeltaT
+ * 可以使用 astro.Swe.DeltaT 精确计算
  */
 func DeltaT(jdUT JulianDay) float64 {
 	jd := jdUT.AsJD2000()

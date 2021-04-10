@@ -1,7 +1,7 @@
 package astro
 
 import (
-	"go-swe/swe"
+	"go-swe/src/swe"
 )
 
 // 天体的 升/降 角度

@@ -2,7 +2,7 @@ package astro
 
 import (
 	"fmt"
-	"go-swe/swe"
+	"go-swe/src/swe"
 	"math"
 )
 

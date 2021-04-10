@@ -18,9 +18,9 @@ const (
 type HourAngle float64
 
 type Coordinates struct {
-	x float64
-	y float64
-	z float64
+	x float64 `json:"x"`
+	y float64 `json:"y"`
+	z float64 `json:"z"`
 }
 
 // 地理坐标系
@@ -29,12 +29,12 @@ type GeographicCoordinates struct {
 	 * 经度 λ lambda
 	 * 西 -180° ~ 本初子午线 0 ~ 东 180°
 	 */
-	Longitude float64
+	Longitude float64 `json:"longitude"`
 	/**
 	 * 纬度 φ phi
 	 * 南 -90° ~ 赤道 0 ~ 北 90°
 	 */
-	Latitude float64
+	Latitude float64 `json:"latitude"`
 }
 
 // 地平坐标系
@@ -46,13 +46,13 @@ type HorizontalCoordinates struct {
 	 * 180° ~ 360° 子午线西, 南 180° ~ 西 270° ~ 北 360°
 	 * 沿着地平线测量的角度（由正北方为起点向东方测量）
 	 */
-	Azimuth float64
+	Azimuth float64 `json:"azimuth"`
 	/**
 	 * 高度角，仰角，地平纬度 Alt a
 	 * 有时就称为高度或海拔标高（elevation, geometric height）
 	 * 天底 -90° ~ 升 0° ~ 天顶 90° ~ 降 0°
 	 */
-	Altitude float64
+	Altitude float64 `json:"altitude"`
 }
 
 // 赤道坐标系
@@ -64,12 +64,12 @@ type EquatorialCoordinates struct {
 	 * 西 -> 东 逆时针
 	 * 春分点：太阳在3月下旬运行至北天球时所通过的点，也是地球的升交点
 	 */
-	RightAscension float64
+	RightAscension float64 `json:"right_ascension"`
 	/**
 	 * 赤纬 δ delta
 	 * 南 -90° ~ 赤道 0 ~ 北 90°
 	 */
-	Declination float64
+	Declination float64 `json:"declination"`
 }
 
 // 黄道坐标系
@@ -79,12 +79,12 @@ type EclipticCoordinates struct {
 	 * 春分点 0 ~ 秋分点 180° ~ 360°
 	 * 西 -> 东 逆时针
 	 */
-	Longitude float64
+	Longitude float64 `json:"longitude"`
 	/**
 	 * 黄道纬度 β beta
 	 * 南 -90° ~ 黄道面 0 ~ 北 90°
 	 */
-	Latitude float64
+	Latitude float64 `json:"latitude"`
 }
 
 // 表示为地理坐标

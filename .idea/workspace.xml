@@ -22,12 +22,45 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1865da48-9c18-49b7-adf5-0858a817268c" name="Default Changelist" comment="add SameSign&#10;add calcCount to solar,lunar">
+    <list default="true" id="1865da48-9c18-49b7-adf5-0858a817268c" name="Default Changelist" comment="fix RadiansMod360, RadiansMod180&#10;optimize LunarSolarEclipticLongitudeDeltaToTime, fast then 1000%">
+      <change afterPath="$PROJECT_DIR$/conf/settings.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/logs/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/home/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/settings/settings.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/web/controllers/init.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/web/controllers/jd.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/web/controllers/lunar.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/web/controllers/solar.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/web/routes.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/go-swe.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/go-swe.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/astro/calendar.go" beforeDir="false" afterPath="$PROJECT_DIR$/astro/calendar.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/astro/lunar.go" beforeDir="false" afterPath="$PROJECT_DIR$/astro/lunar.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/astro/math.go" beforeDir="false" afterPath="$PROJECT_DIR$/astro/math.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/astro/solar.go" beforeDir="false" afterPath="$PROJECT_DIR$/astro/solar.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/astro/astronomy.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/astronomy.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/astro/calendar.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/calendar.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/astro/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/common.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/astro/coordinates.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/coordinates.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/astro/lunar.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/lunar.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/astro/math.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/math.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/astro/solar.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/solar.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/astro/time.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/time.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/astro/twilight.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/twilight.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/const.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/const.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/errors.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/errors.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/extra.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/extra.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/libs.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/libs.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/swe.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/swe.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/swedate.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/swedate.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/swedll.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/swedll.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/swehouse.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/swehouse.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/swejpl.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/swejpl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/swemptab.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/swemptab.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/swenut2000a.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/swenut2000a.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/sweodef.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/sweodef.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/swepcalc.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/swepcalc.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/sweph.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/sweph.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/swephexp.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/swephexp.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/swe/swephlib.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/swe/swephlib.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,6 +70,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="HTML File" />
         <option value="Go File" />
       </list>
     </option>
@@ -58,24 +92,28 @@
   </component>
   <component name="PropertiesComponent">
     <property name="DefaultGoTemplateProperty" value="Go File" />
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="configurable.Global.GOPATH.is.expanded" value="true" />
     <property name="configurable.Module.GOPATH.is.expanded" value="false" />
     <property name="configurable.Project.GOPATH.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="com.goide.configuration.GoProjectSettingsConfigurable" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/logs" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\Codes\Applications\go\go-swe\atro" />
-      <recent name="D:\Codes\Applications\go\go-swe" />
-      <recent name="D:\Codes\Applications\go\go-swe\swe" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Codes\Applications\go\go-swe\logs" />
       <recent name="D:\Codes\Applications\go\go-swe\swe" />
       <recent name="D:\Codes\Applications\go\go-swe" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Codes\Applications\go\go-swe\src\web\controllers" />
+      <recent name="D:\Codes\Applications\go\go-swe\src\web\controllers\astro_controllers" />
+      <recent name="D:\Codes\Applications\go\go-swe\src\web" />
+      <recent name="D:\Codes\Applications\go\go-swe\src" />
+      <recent name="D:\Codes\Applications\go\go-swe\atro" />
     </key>
   </component>
   <component name="RunManager">
@@ -115,100 +153,96 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="add lunar calendar" />
     <MESSAGE value="add SameSign&#10;add calcCount to solar,lunar" />
-    <option name="LAST_COMMIT_MESSAGE" value="add SameSign&#10;add calcCount to solar,lunar" />
+    <MESSAGE value="fix RadiansMod360, RadiansMod180&#10;optimize LunarSolarEclipticLongitudeDeltaToTime, fast then 1000%" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix RadiansMod360, RadiansMod180&#10;optimize LunarSolarEclipticLongitudeDeltaToTime, fast then 1000%" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
-    <state x="518" y="299" width="1092" height="741" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1601962453669">
+    <state x="640" y="254" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1618028929668">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="518" y="299" width="1092" height="741" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1601962453669" />
-    <state x="698" y="320" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1601369483661">
+    <state x="640" y="254" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1618028929668" />
+    <state width="1877" height="266" key="GridCell.Tab.0.bottom" timestamp="1618065319080">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="698" y="320" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1601369483661" />
-    <state x="737" y="225" key="#com.intellij.ide.util.MemberChooser" timestamp="1601304160291">
+    <state width="1877" height="266" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1618065319080" />
+    <state width="1877" height="266" key="GridCell.Tab.0.center" timestamp="1618065319080">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="737" y="225" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1601304160291" />
-    <state x="740" y="274" key="FileChooserDialogImpl" timestamp="1601182535629">
+    <state width="1877" height="266" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1618065319080" />
+    <state width="1877" height="266" key="GridCell.Tab.0.left" timestamp="1618065319079">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="740" y="274" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1601182535629" />
-    <state width="1877" height="348" key="GridCell.Tab.0.bottom" timestamp="1602169488868">
+    <state width="1877" height="266" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1618065319079" />
+    <state width="1877" height="266" key="GridCell.Tab.0.right" timestamp="1618065319080">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488868" />
-    <state width="1877" height="348" key="GridCell.Tab.0.center" timestamp="1602169488868">
+    <state width="1877" height="266" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1618065319080" />
+    <state width="1877" height="348" key="GridCell.Tab.1.bottom" timestamp="1618062178657">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488868" />
-    <state width="1877" height="348" key="GridCell.Tab.0.left" timestamp="1602169488867">
+    <state width="1877" height="348" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1618062178657" />
+    <state width="1877" height="348" key="GridCell.Tab.1.center" timestamp="1618062178656">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488867" />
-    <state width="1877" height="348" key="GridCell.Tab.0.right" timestamp="1602169488868">
+    <state width="1877" height="348" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1618062178656" />
+    <state width="1877" height="348" key="GridCell.Tab.1.left" timestamp="1618062178656">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488868" />
-    <state width="1877" height="348" key="GridCell.Tab.1.bottom" timestamp="1602169488868">
+    <state width="1877" height="348" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1618062178656" />
+    <state width="1877" height="348" key="GridCell.Tab.1.right" timestamp="1618062178657">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488868" />
-    <state width="1877" height="348" key="GridCell.Tab.1.center" timestamp="1602169488868">
+    <state width="1877" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1618062178657" />
+    <state x="461" y="164" key="SettingsEditor" timestamp="1618027068374">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488868" />
-    <state width="1877" height="348" key="GridCell.Tab.1.left" timestamp="1602169488868">
+    <state x="461" y="164" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1618027068374" />
+    <state x="662" y="252" width="596" height="536" key="find.popup" timestamp="1618065462205">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488868" />
-    <state width="1877" height="348" key="GridCell.Tab.1.right" timestamp="1602169488868">
+    <state x="662" y="252" width="596" height="536" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1618065462205" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1618065565857">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="348" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1602169488868" />
-    <state x="461" y="164" key="SettingsEditor" timestamp="1601221774930">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="461" y="164" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1601221774930" />
-    <state x="734" y="355" key="com.goide.refactor.move.GoMoveDeclarationDialog" timestamp="1601031342412">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="734" y="355" key="com.goide.refactor.move.GoMoveDeclarationDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1601031342412" />
-    <state x="1074" y="242" width="596" height="536" key="find.popup" timestamp="1601308407153">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="1074" y="242" width="596" height="536" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1601308407153" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1602064683249">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1602064683249" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1618065565857" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/astro/calendar.go</url>
+          <url>file://$PROJECT_DIR$/src/astro/calendar.go</url>
           <line>68</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/astro/calendar.go</url>
+          <url>file://$PROJECT_DIR$/src/astro/calendar.go</url>
           <line>39</line>
           <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/src/web/controllers/solar.go</url>
+          <line>16</line>
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/../go-common/web/controllers/handle.go</url>
+          <line>33</line>
+          <option name="timeStamp" value="18" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="GoApplicationRunConfiguration">
-        <watch expression="nextNewMoon.ToTime(nil)" language="go" />
-        <watch expression="winterSolstices[0].ToTime(nil)" language="go" />
+        <watch expression="reflect.TypeOf(err)" language="go" />
+        <watch expression="reflect.TypeOf(err).Elem().Name()" language="go" />
       </configuration>
     </watches-manager>
   </component>

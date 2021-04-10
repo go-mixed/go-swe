@@ -1,7 +1,7 @@
 package astro
 
 import (
-	"go-swe/swe"
+	"go-swe/src/swe"
 	"math"
 )
 
@@ -36,37 +36,37 @@ type Astronomy struct {
 type EclipticProperties struct {
 	// 真黄赤交角(含章动)，即转轴倾角
 	// true obliquity of the Ecliptic (includes nutation)
-	TrueObliquity float64
+	TrueObliquity float64 `json:"true_obliquity"`
 	// 平黄赤交角
 	// 比如地球是：23°26′20.512″
 	// mean obliquity of the Ecliptic
-	MeanObliquity float64
+	MeanObliquity float64 `json:"mean_obliquity"`
 	// 黄经章动
 	// nutation in longitude
-	NutationInLongitude float64
+	NutationInLongitude float64 `json:"nutation_in_longitude"`
 	// 倾角章动
 	// nutation in obliquity
-	NutationInObliquity float64
+	NutationInObliquity float64 `json:"nutation_in_obliquity"`
 }
 
 type PlanetProperties struct {
-	PlanetId swe.Planet
+	PlanetId swe.Planet `json:"planet_id"`
 	// 黄道坐标
-	Ecliptic *EclipticCoordinates
+	Ecliptic *EclipticCoordinates `json:"ecliptic"`
 	// 距离 单位是 AU, 转化为千米 则是 Distance * AU
-	Distance float64
+	Distance float64 `json:"distance"`
 	// 黄经的速度 单位是 弧度/天
-	SpeedInLongitude float64
+	SpeedInLongitude float64 `json:"speed_in_longitude"`
 	// 黄纬的速度 单位是 弧度/天
-	SpeedInLatitude float64
+	SpeedInLatitude float64 `json:"speed_in_latitude"`
 	// 距离的速度
-	SpeedInDistance float64
+	SpeedInDistance float64 `json:"speed_in_distance"`
 	// 时角
-	HourAngle HourAngle
+	HourAngle HourAngle `json:"hour_angle"`
 	// 赤道坐标
-	Equatorial *EquatorialCoordinates
+	Equatorial *EquatorialCoordinates `json:"equatorial"`
 	// 地平坐标
-	Horizontal *HorizontalCoordinates
+	Horizontal *HorizontalCoordinates `json:"horizontal"`
 }
 
 // 返回千米为单位的距离

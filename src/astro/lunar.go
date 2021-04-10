@@ -2,7 +2,7 @@ package astro
 
 import (
 	"fmt"
-	"go-swe/swe"
+	"go-swe/src/swe"
 	"math"
 )
 
@@ -207,6 +207,8 @@ func (astro *Astronomy) LunarPhasesRange(startJdUT, endJdUT JulianDay) ([]*Julia
 	// 得到他们对应的角度
 	for i, _ := range lunarTimes {
 		delta := float64(degreePerLunarPhases*i) + firstValidDelta
+		for ; delta < 0; delta = 360 + delta {
+		}
 		eclipticLongitudeDelta[i] = delta
 		lunarTimes[i] = NewJulianDayExtra(0, int(delta)/degreePerLunarPhases%4)
 	}
@@ -243,7 +245,7 @@ func (astro *Astronomy) LunarPhases(year int) ([]*JulianDayExtra, error) {
  * startJdUT 起始时间
  * count 计算多少个朔日
  */
-func (astro *Astronomy) NewMoons(startJdUT JulianDay, count int) ([]JulianDay, error) {
+func (astro *Astronomy) NextNewMoons(startJdUT JulianDay, count int) ([]JulianDay, error) {
 
 	eclipticLongitudeDeltas := make([]float64, count)
 	for i := range eclipticLongitudeDeltas {
@@ -263,7 +265,7 @@ func (astro *Astronomy) NewMoons(startJdUT JulianDay, count int) ([]JulianDay, e
  * startJdUT 起始时间
  */
 func (astro *Astronomy) LastNewMoons(startJdUT JulianDay) (JulianDay, error) {
-	times, err := astro.NewMoons(startJdUT-MeanLunarDays*1.5, 3)
+	times, err := astro.NextNewMoons(startJdUT-MeanLunarDays*1.5, 3)
 	if err != nil {
 		return 0, fmt.Errorf("LastNewMoons: %w", err)
 	}

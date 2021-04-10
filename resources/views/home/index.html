@@ -1,0 +1,25 @@
+{{define "home/index.html"}}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <title>Swiss Ephemeris API</title>
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-header">Swiss Ephemeris API <small>瑞士星历表 API</small></h1>
+
+        <div>
+            <h2 class="page-header">Solar Terms <small>24节气</small> </h2>
+            <div>
+                <label for="">/solar/terms/<i>{year}</i></label> <a href="/solar/terms/2021" target="_blank">示例(2021年)</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{{end}}
