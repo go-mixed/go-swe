@@ -22,7 +22,10 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1865da48-9c18-49b7-adf5-0858a817268c" name="Default Changelist" comment="move to src/&#10;add web server" />
+    <list default="true" id="1865da48-9c18-49b7-adf5-0858a817268c" name="Default Changelist" comment="move to src/&#10;add web server">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/home/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/home/index.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -131,22 +134,22 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="640" y="254" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1618028929668" />
-    <state width="1877" height="266" key="GridCell.Tab.0.bottom" timestamp="1618065730512">
+    <state width="1877" height="266" key="GridCell.Tab.0.bottom" timestamp="1618123682855">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="266" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1618065730512" />
-    <state width="1877" height="266" key="GridCell.Tab.0.center" timestamp="1618065730512">
+    <state width="1877" height="266" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1618123682855" />
+    <state width="1877" height="266" key="GridCell.Tab.0.center" timestamp="1618123682855">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="266" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1618065730512" />
-    <state width="1877" height="266" key="GridCell.Tab.0.left" timestamp="1618065730512">
+    <state width="1877" height="266" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1618123682855" />
+    <state width="1877" height="266" key="GridCell.Tab.0.left" timestamp="1618123682855">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="266" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1618065730512" />
-    <state width="1877" height="266" key="GridCell.Tab.0.right" timestamp="1618065730512">
+    <state width="1877" height="266" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1618123682855" />
+    <state width="1877" height="266" key="GridCell.Tab.0.right" timestamp="1618123682855">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="266" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1618065730512" />
+    <state width="1877" height="266" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1618123682855" />
     <state width="1877" height="348" key="GridCell.Tab.1.bottom" timestamp="1618062178657">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -200,7 +203,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/../go-common/web/controllers/handle.go</url>
-          <line>33</line>
+          <line>39</line>
           <option name="timeStamp" value="18" />
         </line-breakpoint>
       </breakpoints>

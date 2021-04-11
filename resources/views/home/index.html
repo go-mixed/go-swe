@@ -8,15 +8,135 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <title>Swiss Ephemeris API</title>
+    <style>
+        .api  { }
+        .api .uri {margin-left: 20px; font-size: 1.2em}
+        .api .description {margin-left: 20px; font-size: 1em}
+    </style>
 </head>
 <body>
     <div class="container">
         <h1 class="page-header">Swiss Ephemeris API <small>瑞士星历表 API</small></h1>
 
         <div>
-            <h2 class="page-header">Solar Terms <small>24节气</small> </h2>
+            <h2 class="page-header">JSON struct of response <small>返回的JSON结构</small></h2>
+<pre><code>{
+    "code": 0,
+    "message": "a message for this result",
+    "data: {
+        ...
+    },
+    "at": 0,
+    "duration": 0
+}</code></pre>
             <div>
-                <label for="">/solar/terms/<i>{year}</i></label> <a href="/solar/terms/2021" target="_blank">示例(2021年)</a>
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <td>Field <small>字段</small></td>
+                        <td>Type <small>类型</small></td>
+                        <td>Description <small>描述</small></td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>code</td>
+                        <td>integer</td>
+                        <td>0 for success, non-zero for error. <br><small>为0表示执行成功，非0表示出错</small></td>
+                    </tr>
+                    <tr>
+                        <td>message (optional)</td>
+                        <td>string</td>
+                        <td>error message. no this field when success.<br><small>错误信息，成功时无此字段</small></td>
+                    </tr>
+                    <tr>
+                        <td>data <i class="text-danger glyphicon glyphicon-info-sign"></i></td>
+                        <td>null|object|any</td>
+                        <td>the result of this api.<br><small>API返回的结果</small></td>
+                    </tr>
+                    <tr>
+                        <td>at</td>
+                        <td>integer</td>
+                        <td>current timestamp (millisecond).<br><small>当前时间的时间戳（毫秒）</small></td>
+                    </tr>
+                    <tr>
+                        <td>duration</td>
+                        <td>float</td>
+                        <td>how long do this api execution(millisecond).<br><small>当前API执行时长（毫秒）</small></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="alert alert-warning">
+                <i class="text-danger glyphicon glyphicon-info-sign"></i>
+                Note: The following API result refers to the value of the <code>data</code> field.
+                <br>
+                <i class="text-danger glyphicon glyphicon-info-sign"></i>
+                注意：下文的API结果的一律指上面的<code>data</code>字段的值
+            </div>
+        </div>
+        <div>
+            <h2 class="page-header">Solar <small>太阳相关</small> </h2>
+            <div class="panel panel-info api">
+                <div class="panel-heading">
+                    <button class="btn btn-info btn-sm">GET</button>
+                    <span class="uri"><b>/solar/terms/<i>{year}</i></b></span>
+                    <span class="description">Solar Terms <small>24节气</small></span>
+                    <span class="pull-right"><a href="/solar/terms/2021" class="" target="_blank"><i class="glyphicon glyphicon-question-sign" aria-hidden="true"></i> Example 2021yr</a></span>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="panel-body">
+<pre><code>{
+    "year": 2021,
+    "results": [
+        {
+            "jd_ut": 2459219.6411574497,
+            "index": 19
+        },
+        ...
+    ],
+    "term_strings": ["春分", "清明", "谷雨", "立夏", "小满", "芒种", "夏至", "小暑", "大暑", "立秋", "处暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪", "冬至", "小寒", "大寒", "立春", "雨水", "惊蛰"]
+}</code></pre>
+                    <div>
+
+                    </div>
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <td>Field <small>字段</small></td>
+                            <td>Type <small>类型</small></td>
+                            <td>Description <small>描述</small></td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>year</td>
+                            <td>integer</td>
+                            <td>the <code>year</code> in the url. <br><small>URL中传递的<code>{year}</code></small></td>
+                        </tr>
+                        <tr>
+                            <td>results</td>
+                            <td>array</td>
+                            <td>error message. no this field when success.<br><small>错误信息，成功时无此字段</small></td>
+                        </tr>
+                        <tr>
+                            <td>results.jd_ut</td>
+                            <td>integer</td>
+                            <td>the result of this api.<br><small>API返回的结果</small></td>
+                        </tr>
+                        <tr>
+                            <td>results.index</td>
+                            <td>integer</td>
+                            <td>current timestamp (millisecond).<br><small>当前时间的时间戳（毫秒）</small></td>
+                        </tr>
+                        <tr>
+                            <td>term_strings</td>
+                            <td>array[string]</td>
+                            <td>how long do this api execution(millisecond).<br><small>当前API执行时长（毫秒）</small></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
