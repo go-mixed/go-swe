@@ -3,9 +3,9 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go-common-cache"
 	"go-common-web/controllers"
-	"go-common/cache"
-	"go-common/utils"
+	"go-common/utils/conv"
 	"go-swe/src/astro"
 )
 
@@ -13,8 +13,8 @@ type LunarController struct {
 	controllers.Controller
 }
 
-func (c *LunarController) PhasesByYear() (gin.H, *controllers.ResponseException) {
-	year := utils.Atoi(c.Context.Param("year"), 0)
+func (c *LunarController) PhasesByYear() (gin.H, error) {
+	year := conv.Atoi(c.Context.Param("year"), 0)
 
 	if data, err := cache.Remember(fmt.Sprintf("lunar/phases/%d", year), cacheExpired, func() (interface{}, error) {
 		return astronomy.LunarPhases(year)
@@ -25,12 +25,12 @@ func (c *LunarController) PhasesByYear() (gin.H, *controllers.ResponseException)
 			"phase_strings": astro.LunarPhaseStrings,
 		}, nil
 	} else {
-		return nil, controllers.NewResponseException(4021, err.Error())
+		return nil, controllers.NewResponseException(4021, 400, err.Error())
 	}
 }
 
-func (c *LunarController) MonthsByYear() (gin.H, *controllers.ResponseException) {
-	year := utils.Atoi(c.Context.Param("year"), 0)
+func (c *LunarController) MonthsByYear() (gin.H, error) {
+	year := conv.Atoi(c.Context.Param("year"), 0)
 
 	if data, err := cache.Remember(fmt.Sprintf("lunar/months/%d", year), cacheExpired, func() (interface{}, error) {
 		return astronomy.LunarMonths(year)
@@ -43,6 +43,6 @@ func (c *LunarController) MonthsByYear() (gin.H, *controllers.ResponseException)
 			"leap_string":   astro.LunarMonthStrings[12],
 		}, nil
 	} else {
-		return nil, controllers.NewResponseException(4022, err.Error())
+		return nil, controllers.NewResponseException(4022, 400, err.Error())
 	}
 }

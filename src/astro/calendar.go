@@ -52,7 +52,7 @@ func (astro *Astronomy) LunarMonths(year int) ([]*LunarMonth, error) {
 
 	// 是否有中气
 	// 也需要按照东八区计算
-	var hasMiddleChi = func(start, end JulianDay) bool {
+	var hasMiddleChi = func(start, end JulianDayWithLocation) bool {
 
 		for _, jdExtra := range solarTerms {
 			cst := jdExtra.JdUT.ToCST()
@@ -97,18 +97,14 @@ func (astro *Astronomy) LunarMonths(year int) ([]*LunarMonth, error) {
 	return months, nil
 }
 
-/**
- * 数伏
- * 从夏至开始，依照干支纪日的排列，第3个庚日为初伏，第4个庚日为中伏，立秋后第1个庚日为末伏。当夏至与立秋之间出现4个庚日时中伏为10天，出现5个庚日则为20天
- */
+// DogDays 伏天
+// 从夏至开始，依照干支纪日的排列，第3个庚日为初伏，第4个庚日为中伏，立秋后第1个庚日为末伏。当夏至与立秋之间出现4个庚日时中伏为10天，出现5个庚日则为20天
 func (astro *Astronomy) DogDays(year int) {
 
 }
 
-/**
- * 数九
- * 冬至逢壬日为起点，每“九天”算一“九”，
- */
+// Winter9Days 九天
+//冬至逢壬日为起点，每“九天”算一“九”，
 func (astro *Astronomy) Winter9Days(year int) {
 
 }

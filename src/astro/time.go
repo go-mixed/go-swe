@@ -6,7 +6,14 @@ import (
 	"time"
 )
 
+// JulianDay 儒略日 儒略日是无时区意义的, 即世界时(UT)
 type JulianDay float64
+type MJD float64
+type JD2000 float64
+type JulianDayWithLocation float64
+
+const JD2000_OFFSET float64 = 2451545.
+const JD_CST_OFFSET = 8. / 24.
 
 type EphemerisTime struct {
 	JdUT   JulianDay `json:"jd_ut"`
@@ -18,24 +25,22 @@ type JulianDayExtra struct {
 	Index int       `json:"index"`
 }
 
-const JD2000 JulianDay = 2451545.
-const JD_CST_OFFSET = 8. / 24.
-
-// time 转为 儒略日 JulianDay
-// 如果需要UT的儒略，需自行转换，如：_time.UTC()
+// TimeToJulianDay time 转为 儒略日 JulianDay
+// 带时区的时间会被自动转为UTC
 func TimeToJulianDay(_time time.Time) JulianDay {
+	_time = _time.UTC()
 	_hour := float64(_time.Hour()) + float64(_time.Minute())/60. + float64(_time.Second()+_time.Nanosecond()/1e9)/3600.
 	jd, _ := swe.NewSwe().JulDay(_time.Year(), int(_time.Month()), _time.Day(), _hour, swe.Gregorian)
 
 	return JulianDay(jd)
 }
 
-// 将 时,分,秒 转化为 儒略日的小数部分 JulianDay
+// MakeJulianDayHours 将 时,分,秒 (只能为UTC) 转化为 儒略日的小数部分 JulianDay
 func MakeJulianDayHours(hour, minute int, second float64) float64 {
 	return float64(hour) + float64(minute)/60. + second/3600.
 }
 
-// 将 儒略日的小数部分 转化为 时,分,秒
+// ExtractJulianDayHours 将 儒略日的小数部分 转化为 时,分,秒 (UTC)
 func ExtractJulianDayHours(hours float64) (hour, minute int, second float64) {
 	hour = int(hours)
 	minute = int(math.Mod(hours*60, 60))
@@ -44,7 +49,7 @@ func ExtractJulianDayHours(hours float64) (hour, minute int, second float64) {
 	return
 }
 
-// 年,月,日,时,分,秒 转换为 儒略日 JulianDay
+// DateToJulianDay 年,月,日,时,分,秒 (只能为UTC) 转换为 儒略日 JulianDay
 func DateToJulianDay(year, month, day, hour, minute int, second float64) JulianDay {
 	_hour := MakeJulianDayHours(hour, minute, second)
 
@@ -53,7 +58,7 @@ func DateToJulianDay(year, month, day, hour, minute int, second float64) JulianD
 	return JulianDay(jd)
 }
 
-// 儒略日 JulianDay 转化为 年,月,日,时,分,秒
+// ExtractJulianDay 儒略日 JulianDay 转化为 年,月,日,时,分,秒 (UTC)
 func ExtractJulianDay(jd JulianDay) (year, month, day, hour, minute int, second float64) {
 	year, month, day, hours, _ := swe.NewSwe().RevJul(float64(jd), swe.Gregorian)
 	hour, minute, second = ExtractJulianDayHours(hours)
@@ -78,32 +83,58 @@ func NewJulianDayExtra(jdUT JulianDay, index int) *JulianDayExtra {
 	return &JulianDayExtra{JdUT: jdUT, Index: index}
 }
 
-// Ephemeris time 天文历时
+// ToTime Ephemeris time 天文历时 jd转为local的 time.Time, 此时jd的时区
 func (jd JulianDay) ToTime(local *time.Location) time.Time {
 	if local == nil {
 		local = time.UTC
 	}
 	year, month, day, hour, minute, second := ExtractJulianDay(jd)
-	return time.Date(year, time.Month(month), day, hour, minute, int(second), int((second-float64(int(second)))*1e9), local)
+	date := time.Date(year, time.Month(month), day, hour, minute, int(second), int((second-float64(int(second)))*1e9), time.UTC)
+	return date.In(local)
 }
 
-// JD UT 转 CST
-func (jd JulianDay) ToCST() JulianDay {
-	return jd.Add(JD_CST_OFFSET)
+// ToCST JD UT 转 CST
+func (jd JulianDay) ToCST() JulianDayWithLocation {
+	return jd.ToLocation(JD_CST_OFFSET)
+
 }
 
-// 转换为JD2000的表示方式
-func (jd JulianDay) AsJD2000() JulianDay {
-	return jd - JD2000
+func (jd JulianDay) ToLocation(offset float64) JulianDayWithLocation {
+	return JulianDayWithLocation(float64(jd) + offset)
 }
 
-// 增加日期，float64 的生成规则和儒略日一致
+// ToJD2000 转换为JD2000的表示方式
+func (jd JulianDay) ToJD2000() JD2000 {
+	return JD2000(jd - JulianDay(JD2000_OFFSET))
+}
+
+// ToJulianDay JD2000转化为JD的表示方式
+func (jd2000 JD2000) ToJulianDay() JulianDay {
+	return JulianDay(jd2000 + JD2000(JD2000_OFFSET))
+}
+
+// ToMJD 转换为MJD的表示方式
+func (jd JulianDay) ToMJD() MJD {
+	return MJD(jd - 2400000.5)
+}
+
+// ToJulianDay MJD转化为JD的表示方式
+func (mjd MJD) ToJulianDay() JulianDay {
+	return JulianDay(mjd + 2400000.5)
+}
+
+// ToJulianDay 带时区的JD时间转为JD UT
+func (jdz JulianDayWithLocation) ToJulianDay(offset float64) JulianDay {
+	return JulianDay(float64(jdz) - offset)
+}
+
+// Add 增加日期，float64 的生成规则和儒略日一致
 // 减少请传入负数
 func (jd JulianDay) Add(delta float64) JulianDay {
 	return jd + JulianDay(delta)
 }
 
-// 增加N年，减少用负数
+// AddYears 增加N年，减少用负数
 // 注意：大部分日历操作类都存在这个问题 2000-02-29 + 1 year -> 2001-03-01
 func (jd JulianDay) AddYears(years int) JulianDay {
 	y, m, d, t, _ := swe.NewSwe().RevJul(float64(jd), swe.Gregorian)
@@ -111,7 +142,7 @@ func (jd JulianDay) AddYears(years int) JulianDay {
 	return JulianDay(_jd)
 }
 
-// 增加N月，减少用负数
+// AddMonths 增加N月，减少用负数
 // 注意：大部分日历操作类都存在这个问题 2000-03-31 - 1 month -> 2000-03-02
 func (jd JulianDay) AddMonths(months int) JulianDay {
 	y, m, d, t, _ := swe.NewSwe().RevJul(float64(jd), swe.Gregorian)
@@ -119,85 +150,127 @@ func (jd JulianDay) AddMonths(months int) JulianDay {
 	return JulianDay(_jd)
 }
 
-// 增加N日，减少用负数
+// AddDays 增加N日，减少用负数
 func (jd JulianDay) AddDays(days int) JulianDay {
 	return jd + JulianDay(days)
 }
 
-// 增加N小时，减少用负数
+// AddHours 增加N小时，减少用负数
 func (jd JulianDay) AddHours(hours int) JulianDay {
 	return jd + JulianDay(MakeJulianDayHours(hours, 0, 0))
 }
 
-// 增加N分钟，减少用负数
+// AddMinutes 增加N分钟，减少用负数
 func (jd JulianDay) AddMinutes(minutes int) JulianDay {
 	return jd + JulianDay(MakeJulianDayHours(0, minutes, 0))
 }
 
-// 增加N秒，减少用负数
+// AddSeconds 增加N秒，减少用负数
 func (jd JulianDay) AddSeconds(seconds float64) JulianDay {
 	return jd + JulianDay(MakeJulianDayHours(0, 0, seconds))
 }
 
-// 午夜零点
+// Midnight 午夜零点
 // the nature day's 00:00
-func (jd JulianDay) Midnight() JulianDay {
-	return jd.StartOfDay()
+func (jdz JulianDayWithLocation) Midnight() JulianDayWithLocation {
+	return jdz.StartOfDay()
 }
 
-// 正午
+// Noon 正午
 // the nature day's 12:00
-func (jd JulianDay) Noon() JulianDay {
-	y, m, d, _, _ := swe.NewSwe().RevJul(float64(jd), swe.Gregorian)
+func (jdz JulianDayWithLocation) Noon() JulianDayWithLocation {
+	y, m, d, _, _ := swe.NewSwe().RevJul(float64(jdz), swe.Gregorian)
 	_jd, _ := swe.NewSwe().JulDay(y, m, d, 12, swe.Gregorian)
-	return JulianDay(_jd)
+	return JulianDayWithLocation(_jd)
 }
 
-// 今天的零点，午夜 00:00:00
-func (jd JulianDay) StartOfDay() JulianDay {
-	y, m, d, _, _ := swe.NewSwe().RevJul(float64(jd), swe.Gregorian)
+// StartOfDay 今天的零点，午夜 00:00:00
+func (jdz JulianDayWithLocation) StartOfDay() JulianDayWithLocation {
+	y, m, d, _, _ := swe.NewSwe().RevJul(float64(jdz), swe.Gregorian)
 	_jd, _ := swe.NewSwe().JulDay(y, m, d, 0, swe.Gregorian)
-	return JulianDay(_jd)
+	return JulianDayWithLocation(_jd)
 }
 
-// 今天的 23:59:59
-func (jd JulianDay) EndOfDay() JulianDay {
-	y, m, d, _, _ := swe.NewSwe().RevJul(float64(jd), swe.Gregorian)
+// EndOfDay 今天的 23:59:59
+func (jdz JulianDayWithLocation) EndOfDay() JulianDayWithLocation {
+	y, m, d, _, _ := swe.NewSwe().RevJul(float64(jdz), swe.Gregorian)
 	_jd, _ := swe.NewSwe().JulDay(y, m, d, MakeJulianDayHours(23, 59, 59), swe.Gregorian)
-	return JulianDay(_jd)
+	return JulianDayWithLocation(_jd)
 }
 
-// 月初 XXXX-XX-01 00:00:00
-func (jd JulianDay) StartOfMonth() JulianDay {
-	y, m, _, _, _ := swe.NewSwe().RevJul(float64(jd), swe.Gregorian)
+// StartOfMonth 月初 XXXX-XX-01 00:00:00
+func (jdz JulianDayWithLocation) StartOfMonth() JulianDayWithLocation {
+	y, m, _, _, _ := swe.NewSwe().RevJul(float64(jdz), swe.Gregorian)
 	_jd, _ := swe.NewSwe().JulDay(y, m, 1, 0, swe.Gregorian)
-	return JulianDay(_jd)
+	return JulianDayWithLocation(_jd)
 }
 
-// 月尾 XXXX-XX-日 23:59:59 其中，日可能为：28,29,30,31
-func (jd JulianDay) EndOfMonth() JulianDay {
-	return jd.StartOfMonth().AddMonths(1).AddSeconds(-1)
+// EndOfMonth 月尾 XXXX-XX-日 23:59:59 其中，日可能为：28,29,30,31
+func (jdz JulianDayWithLocation) EndOfMonth() JulianDayWithLocation {
+	return jdz.StartOfMonth().AddMonths(1).AddSeconds(-1)
 }
 
-// 年初 XXXX-01-01 00:00:00
-func (jd JulianDay) StartOfYear() JulianDay {
-	y, _, _, _, _ := swe.NewSwe().RevJul(float64(jd), swe.Gregorian)
-	_jd, _ := swe.NewSwe().JulDay(y, 1, 1, 0, swe.Gregorian)
-	return JulianDay(_jd)
+// StartOfYear 年初 XXXX-01-01 00:00:00
+func (jdz JulianDayWithLocation) StartOfYear() JulianDayWithLocation {
+	y, _, _, _, _ := swe.NewSwe().RevJul(float64(jdz), swe.Gregorian)
+	_jdz, _ := swe.NewSwe().JulDay(y, 1, 1, 0, swe.Gregorian)
+	return JulianDayWithLocation(_jdz)
 }
 
-// 年尾 XXXX-12-31 23:59:59
-func (jd JulianDay) EndOfYear() JulianDay {
-	y, _, _, _, _ := swe.NewSwe().RevJul(float64(jd), swe.Gregorian)
-	_jd, _ := swe.NewSwe().JulDay(y, 12, 31, MakeJulianDayHours(23, 59, 59), swe.Gregorian)
-	return JulianDay(_jd)
+// EndOfYear 年尾 XXXX-12-31 23:59:59
+func (jdz JulianDayWithLocation) EndOfYear() JulianDayWithLocation {
+	y, _, _, _, _ := swe.NewSwe().RevJul(float64(jdz), swe.Gregorian)
+	_jdz, _ := swe.NewSwe().JulDay(y, 12, 31, MakeJulianDayHours(23, 59, 59), swe.Gregorian)
+	return JulianDayWithLocation(_jdz)
 }
 
-// 格林尼治平恒星时(不含赤经章动及非多项式部分),即格林尼治子午圈的平春分点起算的赤经
+// Add 增加日期，float64 的生成规则和儒略日一致
+// 减少请传入负数
+func (jdz JulianDayWithLocation) Add(delta float64) JulianDayWithLocation {
+	return jdz + JulianDayWithLocation(delta)
+}
+
+// AddYears 增加N年，减少用负数
+// 注意：大部分日历操作类都存在这个问题 2000-02-29 + 1 year -> 2001-03-01
+func (jdz JulianDayWithLocation) AddYears(years int) JulianDayWithLocation {
+	y, m, d, t, _ := swe.NewSwe().RevJul(float64(jdz), swe.Gregorian)
+	_jd, _ := swe.NewSwe().JulDay(y+years, m, d, t, swe.Gregorian)
+	return JulianDayWithLocation(_jd)
+}
+
+// AddMonths 增加N月，减少用负数
+// 注意：大部分日历操作类都存在这个问题 2000-03-31 - 1 month -> 2000-03-02
+func (jdz JulianDayWithLocation) AddMonths(months int) JulianDayWithLocation {
+	y, m, d, t, _ := swe.NewSwe().RevJul(float64(jdz), swe.Gregorian)
+	_jd, _ := swe.NewSwe().JulDay(y, m+months, d, t, swe.Gregorian)
+	return JulianDayWithLocation(_jd)
+}
+
+// AddDays 增加N日，减少用负数
+func (jdz JulianDayWithLocation) AddDays(days int) JulianDayWithLocation {
+	return jdz + JulianDayWithLocation(days)
+}
+
+// AddHours 增加N小时，减少用负数
+func (jdz JulianDayWithLocation) AddHours(hours int) JulianDayWithLocation {
+	return jdz + JulianDayWithLocation(MakeJulianDayHours(hours, 0, 0))
+}
+
+// AddMinutes 增加N分钟，减少用负数
+func (jdz JulianDayWithLocation) AddMinutes(minutes int) JulianDayWithLocation {
+	return jdz + JulianDayWithLocation(MakeJulianDayHours(0, minutes, 0))
+}
+
+// AddSeconds 增加N秒，减少用负数
+func (jdz JulianDayWithLocation) AddSeconds(seconds float64) JulianDayWithLocation {
+	return jdz + JulianDayWithLocation(MakeJulianDayHours(0, 0, seconds))
+}
+
+// GreenwichMeridianSiderealTime 格林尼治平恒星时(不含赤经章动及非多项式部分),即格林尼治子午圈的平春分点起算的赤经
 // 可以使用 astro.Swe.SidTime 精确计算
 func GreenwichMeridianSiderealTime(jdUT JulianDay, deltaT float64) float64 {
 	//t是力学时(世纪数)
-	t := float64(jdUT.Add(deltaT).AsJD2000()) / 36525.
+	t := float64(jdUT.Add(deltaT).ToJD2000()) / 36525.
 	t2 := t * t
 	t3 := t2 * t
 	t4 := t3 * t
@@ -265,11 +338,9 @@ func dtCalc(y float64) float64 {
 	return dtAt[i+1] + dtAt[i+2]*t1 + dtAt[i+3]*t2 + dtAt[i+4]*t3
 }
 
-/**
- * 计算UT 和 ET 的 DeltaT
- * 可以使用 astro.Swe.DeltaT 精确计算
- */
+// DeltaT 计算UT 和 ET 的 DeltaT
+// 可以使用 astro.Swe.DeltaT 精确计算
 func DeltaT(jdUT JulianDay) float64 {
-	jd := jdUT.AsJD2000()
+	jd := jdUT.ToJD2000()
 	return dtCalc(float64(jd)/365.2425+2000) / 86400.0
 }

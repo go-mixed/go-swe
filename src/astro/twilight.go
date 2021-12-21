@@ -2,9 +2,10 @@ package astro
 
 import (
 	"go-swe/src/swe"
+	"time"
 )
 
-// 天体的 升/降 角度
+// TwilightAngle 天体的 升/降 角度
 type TwilightAngle struct {
 	// 升天, 降天
 	RiseSet,
@@ -41,7 +42,7 @@ type SunTwilightAngles struct {
 	Astronomical, Nautical, Civil float64
 }
 
-// 天体的 升/降 时间
+// TwilightTimes 天体的 升/降 时间
 type TwilightTimes struct {
 	// 升天, 降天
 	Rise, Set JulianDay
@@ -49,7 +50,7 @@ type TwilightTimes struct {
 	Culmination, LowerCulmination JulianDay
 }
 
-// 天体的 晨/暮 时间
+// DawnDuskTimes 天体的 晨/暮 时间
 type DawnDuskTimes struct {
 	// 晨
 	Dawn JulianDay
@@ -57,7 +58,7 @@ type DawnDuskTimes struct {
 	Dusk JulianDay
 }
 
-// 太阳的 升/降/晨/暮 时间
+// SunTwilightTimes 太阳的 升/降/晨/暮 时间
 type SunTwilightTimes struct {
 	TwilightTimes
 
@@ -87,23 +88,20 @@ func NewTwilightAngle() *TwilightAngle {
 	}
 }
 
-/**
- * 日照时长
- * 日落 - 升日
- */
-func (stt *SunTwilightTimes) Daylight() float64 {
-	return float64(stt.Set - stt.Rise)
+// Daylight 日照时长
+// 日落 - 升日
+func (stt *SunTwilightTimes) Daylight() time.Duration {
+	return time.Duration(float64(stt.Set-stt.Rise) * 86400 * 1e9)
 }
 
-/**
- * 夜晚时长，因为跨午夜，所以取今日00:00 ~ 23:59的时段
- * (0:00 ~ 天文晨光) + (天文暮光 ~ 23:59)
- */
-func (stt *SunTwilightTimes) Night() float64 {
-	return float64(
-		stt.Astronomical.Dawn - stt.Astronomical.Dawn.Midnight() +
-			(stt.Astronomical.Dusk.AddDays(1).Midnight() - stt.Astronomical.Dusk),
-	)
+// Night 夜晚时长，不同于自然夜（即天黑~天亮），而因为跨午夜，所以取今日00:00 ~ 23:59的时段
+// 即 (0:00（今天凌晨） ~ 天文晨光(今天天亮)) + (天文暮光(今天天黑) ~ 23:59（今天半夜）)   即 天文晨光 - 天文暮光 + 1
+func (stt *SunTwilightTimes) Night() time.Duration {
+	return time.Duration(float64(
+		//stt.Astronomical.Dawn - stt.Astronomical.Dawn.Midnight() +
+		//	(stt.Astronomical.Dusk.AddDays(1).Midnight() - stt.Astronomical.Dusk),
+		stt.Astronomical.Dawn-stt.Astronomical.Dusk+1,
+	) * 86400 * 1e9)
 }
 
 /**
@@ -196,7 +194,7 @@ func (astro *Astronomy) AltitudeToTimes(jdUT JulianDay, geo *GeographicCoordinat
  */
 func (astro *Astronomy) SunTwilight(jdUT JulianDay, geo *GeographicCoordinates, withRevise bool) (*SunTwilightTimes, error) {
 	// 查找最靠近当日中午的日上中天, mod2的第1参数为本地时角近似值
-	noonJdUT := jdUT.Add(-Mod2(float64(jdUT.AsJD2000())+geo.Longitude/Radian360, 1))
+	noonJdUT := jdUT.Add(-Mod2(float64(jdUT.ToJD2000())+geo.Longitude/Radian360, 1))
 	jdET := NewEphemerisTime(noonJdUT)
 
 	angle := NewSunTwilightAngles()
@@ -270,12 +268,11 @@ func (astro *Astronomy) SunTwilight(jdUT JulianDay, geo *GeographicCoordinates, 
  * geo 观察者地理位置
  * withRevise: 是否修正一些日光差，或者黄道章动
  */
-
 func (astro *Astronomy) MoonTwilight(jdUT JulianDay, geo *GeographicCoordinates, withRevise bool) (*TwilightTimes, error) {
 	deltaT := astro.DeltaT(jdUT)
 
 	// 查找最靠近当日中午的月上中天, mod2的第1参数为本地时角近似值
-	moonJdUT := jdUT.Add(-Mod2(0.1726222+0.966136808032357*float64(jdUT.AsJD2000())-0.0366*deltaT+geo.Longitude/Radian360, 1))
+	moonJdUT := jdUT.Add(-Mod2(0.1726222+0.966136808032357*float64(jdUT.ToJD2000())-0.0366*deltaT+geo.Longitude/Radian360, 1))
 	jdET := NewEphemerisTime(moonJdUT)
 
 	angle := NewTwilightAngle()
