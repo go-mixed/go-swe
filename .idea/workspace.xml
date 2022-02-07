@@ -4,18 +4,12 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3347a993-022c-48ee-876f-5b1cd855ff3c" name="Changes" comment="upgrade">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="3347a993-022c-48ee-876f-5b1cd855ff3c" name="Changes" comment="rewrite comments to the golang spec">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/astro/astronomy.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/astronomy.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/home/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/home/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/astro/calendar.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/calendar.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/astro/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/common.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/astro/coordinates.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/coordinates.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/astro/lunar.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/lunar.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/astro/math.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/math.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/astro/solar.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/solar.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/astro/twilight.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/twilight.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/web/controllers/lunar.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/web/controllers/lunar.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/web/controllers/solar.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/web/controllers/solar.go" afterDir="false" />
     </list>
@@ -63,14 +57,6 @@
     <property name="settings.editor.selected.configurable" value="actions.on.save" />
   </component>
   <component name="RunManager">
-    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
-      <module name="go-swe" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="FILE" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <method v="2" />
-    </configuration>
     <configuration name="go build go-swe" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="go-swe" />
       <working_directory value="$PROJECT_DIR$" />
@@ -78,15 +64,6 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$/main.go" />
       <output_directory value="$PROJECT_DIR$" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
-      <module name="go-swe" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="DIRECTORY" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
       <method v="2" />
     </configuration>
     <recent_temporary>
@@ -109,7 +86,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="upgrade" />
-    <option name="LAST_COMMIT_MESSAGE" value="upgrade" />
+    <MESSAGE value="rewrite comments to the golang spec" />
+    <option name="LAST_COMMIT_MESSAGE" value="rewrite comments to the golang spec" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>

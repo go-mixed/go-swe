@@ -30,11 +30,13 @@ const (
 )
 
 // ToDegrees 弧度转换为角度
+//	r 弧度
 func ToDegrees(r float64) float64 {
 	return r * 180. / math.Pi
 }
 
 // RadiansMod360 对超过0~2PI的角度转为0~2PI,也就是超过360°转换为360°以内
+//	r 弧度
 func RadiansMod360(r float64) float64 {
 	_r := math.Mod(r, Radian360)
 
@@ -50,6 +52,7 @@ func RadiansMod360(r float64) float64 {
 }
 
 // RadiansMod180 对超过-PI到PI的角度转为-PI到PI, 即转化到-180°~180°
+//	r 弧度
 func RadiansMod180(r float64) float64 {
 	_r := math.Mod(r, Radian360)
 
@@ -68,11 +71,13 @@ func RadiansMod180(r float64) float64 {
 }
 
 // ToRadians 角度转换为弧度
+//	d 角度
 func ToRadians(d float64) float64 {
 	return d * math.Pi / 180.
 }
 
 // DegreesToString 角度转换为书面表达的 ° ′ ″
+//	d 角度
 func DegreesToString(d float64) string {
 	var deg, min int
 	var sec float64
@@ -86,7 +91,7 @@ func DegreesToString(d float64) string {
 }
 
 // StringToDegrees ParseDMS parses a coordinate in degrees, minutes, seconds.
-// - e.g. 33° 23' 22"ma
+//	e.g. 33° 23' 22"ma
 func StringToDegrees(s string) (float64, error) {
 	degrees := 0
 	minutes := 0

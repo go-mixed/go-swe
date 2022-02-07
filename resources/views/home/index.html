@@ -80,22 +80,24 @@
             <div class="panel panel-info api">
                 <div class="panel-heading">
                     <button class="btn btn-info btn-sm">GET</button>
-                    <span class="uri"><b>/solar/terms/<i>{year}</i></b></span>
+                    <span class="uri"><b>/solar/terms/<i>{year}</i></b>?tz=xxx</span>
                     <span class="description">Solar Terms <small>24节气</small></span>
-                    <span class="pull-right"><a href="/solar/terms/2021" class="" target="_blank"><i class="glyphicon glyphicon-question-sign" aria-hidden="true"></i> Example 2021yr</a></span>
                     <div class="clearfix"></div>
                 </div>
                 <div class="panel-body">
-<pre><code>{
+                    <span class=""><a href="/solar/terms/2021?tz=Asia/Shanghai" class="" target="_blank">
+                        <i class="glyphicon glyphicon-question-sign" aria-hidden="true"></i> Example/示例： 2021 year</a></span>
+                    <hr>
+
+                    <pre><code>{
     "year": 2021,
-    "results": [
-        {
+    "solar_terms": {
+        "冬至": {
             "jd_ut": 2459219.6411574497,
-            "index": 19
+            "at": "2021-12-21T23:59:08+08:00",
         },
         ...
-    ],
-    "term_strings": ["春分", "清明", "谷雨", "立夏", "小满", "芒种", "夏至", "小暑", "大暑", "立秋", "处暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪", "冬至", "小寒", "大寒", "立春", "雨水", "惊蛰"]
+    },
 }</code></pre>
                     <div>
 
@@ -110,29 +112,23 @@
                         </thead>
                         <tbody>
                         <tr>
+                            <td><b>tz=</b>Asia/Shanghai</td>
+                            <td>string</td>
+                            <td>the string of time zone. <br><small>时区</small></td>
+                        </tr><tr>
                             <td>year</td>
                             <td>integer</td>
                             <td>the <code>year</code> in the url. <br><small>URL中传递的<code>{year}</code></small></td>
                         </tr>
                         <tr>
-                            <td>results</td>
-                            <td>array</td>
-                            <td>error message. no this field when success.<br><small>错误信息，成功时无此字段</small></td>
+                            <td>solar_terms.jd_ut</td>
+                            <td>float64</td>
+                            <td>julian day of the solar term.(UTC)<br><small>当前节气的儒略日(世界时)</small></td>
                         </tr>
                         <tr>
-                            <td>results.jd_ut</td>
-                            <td>integer</td>
-                            <td>the result of this api.<br><small>API返回的结果</small></td>
-                        </tr>
-                        <tr>
-                            <td>results.index</td>
-                            <td>integer</td>
-                            <td>current timestamp (millisecond).<br><small>当前时间的时间戳（毫秒）</small></td>
-                        </tr>
-                        <tr>
-                            <td>term_strings</td>
-                            <td>array[string]</td>
-                            <td>how long do this api execution(millisecond).<br><small>当前API执行时长（毫秒）</small></td>
+                            <td>solar_terms.at</td>
+                            <td>string</td>
+                            <td>date string of the solar term with time zone.(RFC3339)<br><small>当前节气的时间(RFC3339)</small></td>
                         </tr>
                         </tbody>
                     </table>

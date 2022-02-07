@@ -18,7 +18,8 @@ type LunarMonth struct {
 
 // LunarMonths 阴历
 //
-// 夏正：以冬至日必须在子月（寅正十一月），上个冬至月（寅正十一月）到下个冬至月如有12个月就不置闰，如有13个月就要置闰，以上个冬至月之后第一个无中气的月份为闰月
+// 采用的标准的天文计算的：定朔, 定气法
+// 夏正（建寅、寅正）：以冬至日必须在子月（寅正十一月），上个冬至月（寅正十一月）到下个冬至月如有12个月就不置闰，如有13个月就要置闰，以上个冬至月之后第一个无中气的月份为闰月
 func (astro *Astronomy) LunarMonths(year int) ([]*LunarMonth, error) {
 	// 去年/今年冬至日
 	winterSolstices, err := astro.SolarEclipticLongitudesToTimes(DateToJulianDay(year-1, 12, 1, 0, 0, 0), []float64{ToRadians(270), ToRadians(270)})
@@ -57,7 +58,7 @@ func (astro *Astronomy) LunarMonths(year int) ([]*LunarMonth, error) {
 			cst := jdExtra.JdUT.ToCST()
 			if cst >= start && cst < end {
 				// 雨水、春分、谷雨、小满、夏至、大暑、处暑、秋分、霜降、小雪、冬至和大寒
-				// 也就是可以整除2的
+				// 也就是可以整除2的是中气
 				if jdExtra.Index%2 == 0 {
 					return true
 				}

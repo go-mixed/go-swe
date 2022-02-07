@@ -28,9 +28,17 @@ func (c *SolarController) TermsByYear() (gin.H, error) {
 		return astronomy.SolarTerms(year)
 	}); err == nil {
 		jds := data.([]*astro.JulianDayExtra)
-		var terms map[string]string = map[string]string{}
+		type term struct {
+			JdUT astro.JulianDay `json:"jd_ut"`
+			At   string          `json:"at"`
+		}
+		var terms map[string]term = map[string]term{}
 		for _, jd := range jds {
-			terms[astro.SolarTermsString[jd.Index]] = jd.JdUT.ToTime(tz).Format(time.RFC3339)
+			terms[astro.SolarTermsString[jd.Index]] =
+				term{
+					JdUT: jd.JdUT,
+					At:   jd.JdUT.ToTime(tz).Format(time.RFC3339),
+				}
 		}
 
 		return gin.H{

@@ -108,7 +108,7 @@ func (astro *Astronomy) SolarEclipticLongitudesToTimes(startJdUT JulianDay, ecli
 	return times, nil
 }
 
-// SolarTermsRange 2时间之间的所有节气
+// SolarTermsRange 2时间之间的所有节气，定气法
 //	startJdUT 起始时间
 //	endJdUT 结束时间
 func (astro *Astronomy) SolarTermsRange(startJdUT, endJdUT JulianDay) ([]*JulianDayExtra, error) {
@@ -146,7 +146,7 @@ func (astro *Astronomy) SolarTermsRange(startJdUT, endJdUT JulianDay) ([]*Julian
 	return solarTerms, nil
 }
 
-// SolarTerms 该年的24节气的时间, 万年历主入口
+// SolarTerms 该年的24节气的时间, 定气法
 //	year 年
 func (astro *Astronomy) SolarTerms(year int) ([]*JulianDayExtra, error) {
 	jd := DateToJulianDay(year, 1, 1, 0, 0, 0)

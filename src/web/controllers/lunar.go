@@ -40,14 +40,16 @@ func (c *LunarController) MonthsByYear() (gin.H, error) {
 		tz, _ := time.LoadLocation("Asia/Shanghai")
 
 		type lunarMonth struct {
-			At   string
-			Days int
-			Leap bool
+			JdUT astro.JulianDay `json:"jd_ut"`
+			At   string          `json:"at"`
+			Days int             `json:"days"`
+			Leap bool            `json:"leap"`
 		}
 
 		var _lunarMonths map[string]lunarMonth = map[string]lunarMonth{}
 		for _, month := range lunarMonths {
 			_lunarMonths[astro.LunarMonthStrings[month.Index]] = lunarMonth{
+				JdUT: month.JdUT,
 				At:   month.JdUT.ToTime(tz).Format(time.RFC3339),
 				Leap: month.Leap,
 				Days: month.Days,
