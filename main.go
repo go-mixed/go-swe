@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/spf13/cobra"
 	web2 "go-common-web"
 	"go-common/task_pool"
@@ -14,8 +15,6 @@ import (
 	"path/filepath"
 	"time"
 )
-
-var settings *conf.Settings
 
 func main() {
 	// 读取当前执行文件的目录
@@ -41,9 +40,8 @@ func main() {
 }
 
 func run(_configFile, _logPath string) {
-	var err error
 	// 读取配置文件
-	settings, err = conf.LoadSettings(_configFile)
+	settings, err := conf.LoadSettings(_configFile)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -59,7 +57,7 @@ func run(_configFile, _logPath string) {
 	defer exec.Stop()
 	exec.ListenStopSignal()
 
-	exec.Submit(func(stopChan <-chan struct{}) {
+	exec.Submit(func(ctx context.Context) {
 		engine := web2.NewGinEngine(web2.DefaultGinOptions(settings.Debug, true))
 		web.RegisterRouter(engine)
 		server := web2.NewHttpServer(web2.DefaultServerOptions(settings.Host))
@@ -67,7 +65,7 @@ func run(_configFile, _logPath string) {
 			logger.Error(err.Error())
 			return
 		}
-		if err := server.Run(stopChan, nil); err != nil {
+		if err := server.Run(ctx, nil); err != nil {
 			logger.Error(err.Error())
 		}
 	})

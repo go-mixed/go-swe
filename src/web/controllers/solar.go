@@ -34,10 +34,8 @@ func (c *SolarController) TermsByYear() (gin.H, error) {
 		}
 
 		return gin.H{
-			"year":         year,
-			"jds":          data,
-			"solar_terms":  terms,
-			"term_strings": astro.SolarTermsString,
+			"year":        year,
+			"solar_terms": terms,
 		}, nil
 	} else {
 		return nil, controllers.NewResponseException(4011, 400, err.Error())

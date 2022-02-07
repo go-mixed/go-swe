@@ -10,14 +10,15 @@ import (
 )
 
 const (
-	// 每弧度的角秒数，此处的3600是因为 1° == 3600″
+	// DegreeSecondsPerRadian 每弧度的角秒数，此处的3600是因为 1° == 3600″
+	//
 	// 所以可读的表达式为 角° = 1 弧度 * 180 / Pi; 角″ = 角° * 3600
 	DegreeSecondsPerRadian float64 = 1 * 180 * 3600. / math.Pi
-	// 90°的弧度
+	// Radian90 90°的弧度
 	Radian90 float64 = math.Pi / 2.
-	// 180°的弧度
+	// Radian180 180°的弧度
 	Radian180 float64 = math.Pi
-	// 360°的弧度
+	// Radian360 360°的弧度
 	Radian360 float64 = math.Pi * 2
 )
 
@@ -33,7 +34,7 @@ func ToDegrees(r float64) float64 {
 	return r * 180. / math.Pi
 }
 
-// 对超过0~2PI的角度转为0~2PI,也就是超过360°转换为360°以内
+// RadiansMod360 对超过0~2PI的角度转为0~2PI,也就是超过360°转换为360°以内
 func RadiansMod360(r float64) float64 {
 	_r := math.Mod(r, Radian360)
 
@@ -48,7 +49,7 @@ func RadiansMod360(r float64) float64 {
 	return _r
 }
 
-// 对超过-PI到PI的角度转为-PI到PI, 即转化到-180°~180°
+// RadiansMod180 对超过-PI到PI的角度转为-PI到PI, 即转化到-180°~180°
 func RadiansMod180(r float64) float64 {
 	_r := math.Mod(r, Radian360)
 
@@ -71,7 +72,7 @@ func ToRadians(d float64) float64 {
 	return d * math.Pi / 180.
 }
 
-// String 角度转换为书面表达的 ° ′ ″
+// DegreesToString 角度转换为书面表达的 ° ′ ″
 func DegreesToString(d float64) string {
 	var deg, min int
 	var sec float64
@@ -84,7 +85,7 @@ func DegreesToString(d float64) string {
 	return fmt.Sprintf("%d%c%d%c%.4f%c", deg, DegreesRune, min, MinutesRune, sec, SecondsRune)
 }
 
-// ParseDMS parses a coordinate in degrees, minutes, seconds.
+// StringToDegrees ParseDMS parses a coordinate in degrees, minutes, seconds.
 // - e.g. 33° 23' 22"ma
 func StringToDegrees(s string) (float64, error) {
 	degrees := 0
@@ -136,15 +137,14 @@ func StringToDegrees(s string) (float64, error) {
 	return val, nil
 }
 
-/**
- * 时间 转 角度
- * 赤经、恒星时、时角 有一种小时表示的单位，也就是24h = 360°
- */
+// HoursToDegrees 时间 转 角度
+//
+// 赤经、恒星时、时角 有一种小时表示的单位，也就是24h = 360°
 func HoursToDegrees(hours float64) float64 {
 	return hours * 15
 }
 
-// 临界余数(v与最近的整倍数n相差的距离)
+// Mod2 临界余数(v与最近的整倍数n相差的距离)
 func Mod2(v, n float64) float64 {
 	c := v / n
 	c -= math.Floor(c) // 取两者余数的小数部分
@@ -156,9 +156,9 @@ func Mod2(v, n float64) float64 {
 	return c * n // 得到余数
 }
 
-// 取一下倍数
-// 比如: NextMultiples(31, 15) = 45  30的下一个符合15的倍数是45
-// NextMultiples(30, 15) = 30
+// NextMultiples 取一下倍数
+//
+// 比如: NextMultiples(31, 15) = 45  30的下一个符合15的倍数是45， NextMultiples(30, 15) = 30
 func NextMultiples(v, n float64) float64 {
 	c := v / n
 	i := math.Floor(c) // 取两者的整数部分
@@ -172,12 +172,12 @@ func NextMultiples(v, n float64) float64 {
 	return n * i
 }
 
-// 求2个浮点数是否相等, scale 是对比小数位数
+// FloatEqual 求2个浮点数是否相等, scale 是对比小数位数
 func FloatEqual(x, y float64, scale int) bool {
 	return math.Abs(x-y) < (1 / math.Pow(10, float64(scale)))
 }
 
-// 两个浮点数是否正负相同
+// SameSign 两个浮点数是否正负相同
 func SameSign(x, y float64) bool {
 	return (x < 0) == (y < 0)
 }

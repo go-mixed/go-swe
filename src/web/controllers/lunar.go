@@ -7,6 +7,7 @@ import (
 	"go-common-web/controllers"
 	"go-common/utils/conv"
 	"go-swe/src/astro"
+	"time"
 )
 
 type LunarController struct {
@@ -35,12 +36,27 @@ func (c *LunarController) MonthsByYear() (gin.H, error) {
 	if data, err := cache.Remember(fmt.Sprintf("lunar/months/%d", year), cacheExpired, func() (interface{}, error) {
 		return astronomy.LunarMonths(year)
 	}); err == nil {
+		lunarMonths := data.([]*astro.LunarMonth)
+		tz, _ := time.LoadLocation("Asia/Shanghai")
+
+		type lunarMonth struct {
+			At   string
+			Days int
+			Leap bool
+		}
+
+		var _lunarMonths map[string]lunarMonth = map[string]lunarMonth{}
+		for _, month := range lunarMonths {
+			_lunarMonths[astro.LunarMonthStrings[month.Index]] = lunarMonth{
+				At:   month.JdUT.ToTime(tz).Format(time.RFC3339),
+				Leap: month.Leap,
+				Days: month.Days,
+			}
+		}
+
 		return gin.H{
-			"year":          year,
-			"result":        data,
-			"month_strings": astro.LunarMonthStrings[0:12],
-			"day_strings":   astro.LunarDayStrings,
-			"leap_string":   astro.LunarMonthStrings[12],
+			"year":         year,
+			"lunar_months": _lunarMonths,
 		}, nil
 	} else {
 		return nil, controllers.NewResponseException(4022, 400, err.Error())

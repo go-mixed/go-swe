@@ -9,12 +9,12 @@ const (
 	WestString  = "W"
 )
 
-/**
- * 时角 τ tau
- * https://zh.wikipedia.org/wiki/File:HourAngle_Observer_en.png
- * 该天体的赤经与当地的恒星时的差值，从子午线沿天赤道，到目标所在过地球极点的球面大圆的角距离
- * 在子午线的东边则为负时角，在子午线的西边则为正时角，或者向西为正的360度，时角与经度的换算方法为24h = 360°
- */
+// HourAngle 时角 τ tau
+//	https://zh.wikipedia.org/wiki/File:HourAngle_Observer_en.png
+//
+// 该天体的赤经与当地的恒星时的差值，从子午线沿天赤道，到目标所在过地球极点的球面大圆的角距离
+//
+// 在子午线的东边则为负时角，在子午线的西边则为正时角，或者向西为正的360度，时角与经度的换算方法为24h = 360°
 type HourAngle float64
 
 type Coordinates struct {
@@ -23,7 +23,7 @@ type Coordinates struct {
 	z float64 `json:"z"`
 }
 
-// 地理坐标系
+// GeographicCoordinates 地理坐标系
 type GeographicCoordinates struct {
 	/**
 	 * 经度 λ lambda
@@ -37,7 +37,8 @@ type GeographicCoordinates struct {
 	Latitude float64 `json:"latitude"`
 }
 
-// 地平坐标系
+// HorizontalCoordinates 地平坐标系
+//
 // https://zh.wikipedia.org/wiki/File:Azimuth-Altitude_schematic.svg
 type HorizontalCoordinates struct {
 	/**
@@ -55,7 +56,7 @@ type HorizontalCoordinates struct {
 	Altitude float64 `json:"altitude"`
 }
 
-// 赤道坐标系
+// EquatorialCoordinates 赤道坐标系
 // https://en.wikipedia.org/wiki/File:Ra_and_dec_demo_animation_small.gif
 type EquatorialCoordinates struct {
 	/**
@@ -72,7 +73,7 @@ type EquatorialCoordinates struct {
 	Declination float64 `json:"declination"`
 }
 
-// 黄道坐标系
+// EclipticCoordinates 黄道坐标系
 type EclipticCoordinates struct {
 	/**
 	 * 黄道经度 λ lambda
@@ -87,7 +88,7 @@ type EclipticCoordinates struct {
 	Latitude float64 `json:"latitude"`
 }
 
-// 表示为地理坐标
+// AsGeographicCoordinates 表示为地理坐标
 func (h *HorizontalCoordinates) AsGeographicCoordinates() *GeographicCoordinates {
 	return &GeographicCoordinates{
 		Longitude: h.Azimuth,
@@ -95,7 +96,7 @@ func (h *HorizontalCoordinates) AsGeographicCoordinates() *GeographicCoordinates
 	}
 }
 
-// 表示为地理坐标
+// AsGeographicCoordinates 表示为地理坐标
 func (e *EquatorialCoordinates) AsGeographicCoordinates() *GeographicCoordinates {
 	return &GeographicCoordinates{
 		Longitude: e.RightAscension,
@@ -103,7 +104,7 @@ func (e *EquatorialCoordinates) AsGeographicCoordinates() *GeographicCoordinates
 	}
 }
 
-// 表示为地理坐标
+// AsGeographicCoordinates 表示为地理坐标
 func (e *EclipticCoordinates) AsGeographicCoordinates() *GeographicCoordinates {
 	return &GeographicCoordinates{
 		Longitude: e.Longitude,
@@ -111,7 +112,7 @@ func (e *EclipticCoordinates) AsGeographicCoordinates() *GeographicCoordinates {
 	}
 }
 
-// 表示为地平坐标
+// AsHorizontalCoordinates 表示为地平坐标
 func (g *GeographicCoordinates) AsHorizontalCoordinates() *HorizontalCoordinates {
 	return &HorizontalCoordinates{
 		Azimuth:  g.Longitude,
@@ -119,7 +120,7 @@ func (g *GeographicCoordinates) AsHorizontalCoordinates() *HorizontalCoordinates
 	}
 }
 
-// 表示为赤道坐标
+// AsEquatorialCoordinates 表示为赤道坐标
 func (g *GeographicCoordinates) AsEquatorialCoordinates() *EquatorialCoordinates {
 	return &EquatorialCoordinates{
 		RightAscension: g.Longitude,
@@ -127,7 +128,7 @@ func (g *GeographicCoordinates) AsEquatorialCoordinates() *EquatorialCoordinates
 	}
 }
 
-// 表示为黄道坐标
+// AsEclipticCoordinates 表示为黄道坐标
 func (g *GeographicCoordinates) AsEclipticCoordinates() *EclipticCoordinates {
 	return &EclipticCoordinates{
 		Longitude: g.Longitude,
@@ -135,13 +136,12 @@ func (g *GeographicCoordinates) AsEclipticCoordinates() *EclipticCoordinates {
 	}
 }
 
-/**
- * 赤道坐标 -> 地平坐标
- * https://zh.wikipedia.org/wiki/%E5%9C%B0%E5%B9%B3%E5%9D%90%E6%A8%99%E7%B3%BB
- * HourAngle: 时角
- * declination: 赤纬
- * latitude: 观察者纬度
- */
+// EquatorialToHorizontal 赤道坐标 -> 地平坐标
+//
+// https://zh.wikipedia.org/wiki/%E5%9C%B0%E5%B9%B3%E5%9D%90%E6%A8%99%E7%B3%BB
+//	HourAngle: 时角
+//	declination: 赤纬
+//	latitude: 观察者纬度
 func EquatorialToHorizontal(hourAngle HourAngle, declination, latitude float64) *HorizontalCoordinates {
 	/*
 		纬度用φ表示，赤纬用δ表示，地方时(时角)以H表示：
@@ -169,13 +169,12 @@ func EquatorialToHorizontal(hourAngle HourAngle, declination, latitude float64) 
 	}
 }
 
-/**
- * 根据高度角和当前的赤纬、地理纬度 计算 时角
- * 一般用于计算星星的升天、中天等值。但是此时得到的时角是不准确的，因为高度角变化时，星星的赤纬也在变化，需要多次求解
- * declination: 赤纬
- * latitude: 观察者纬度
- * altitude: 高度角
- */
+// AltitudeToHourAngle 根据高度角和当前的赤纬、地理纬度 计算 时角
+//
+// 一般用于计算星星的升天、中天等值。但是此时得到的时角是不准确的，因为高度角变化时，星星的赤纬也在变化，需要多次求解
+//	declination: 赤纬
+//	latitude: 观察者纬度
+//	altitude: 高度角
 func AltitudeToHourAngle(declination, latitude, altitude float64) HourAngle {
 	// 纬度用φ表示，赤纬用δ表示，地方时(时角)以H表示：
 	// sin(Alt) = sin(φ) * sin(δ) + cos(φ) * cos(δ) * cos(H)
@@ -190,12 +189,11 @@ func AltitudeToHourAngle(declination, latitude, altitude float64) HourAngle {
 	return HourAngle(math.Acos(ha))
 }
 
-/**
- * 黄道坐标 <-> 赤道坐标 互转 也就是 球面坐标旋转
- * 如果是 赤->黄 eclipticObliquity 设置为负数
- * eclipticObliquity: 黄赤交角，比如地球是：23°26′20.512″
- * https://zh.wikipedia.org/wiki/%E9%BB%83%E9%81%93%E5%9D%90%E6%A8%99%E7%B3%BB
- */
+// EclipticEquatorialConverter 黄道坐标 <-> 赤道坐标 互转 也就是 球面坐标旋转
+//
+// 如果是 赤->黄 eclipticObliquity 设置为负数
+// 	eclipticObliquity: 黄赤交角，比如地球是：23°26′20.512″
+// https://zh.wikipedia.org/wiki/%E9%BB%83%E9%81%93%E5%9D%90%E6%A8%99%E7%B3%BB
 func EclipticEquatorialConverter(coordinates *GeographicCoordinates, eclipticObliquity float64) *GeographicCoordinates {
 	/*
 		λ和β代表黄经和黄纬
@@ -236,9 +234,7 @@ func EclipticEquatorialConverter(coordinates *GeographicCoordinates, eclipticObl
 	cosW := math.Cos(coordinates.Latitude)
 	tanW := math.Tan(coordinates.Latitude)
 
-	/*
-		黄 -> 赤 公式
-	*/
+	//	黄 -> 赤 公式
 	longitude := math.Atan2(sinJ*cosE-tanW*sinE, cosJ)
 	latitude := math.Asin(sinW*cosE + cosW*sinE*sinJ)
 
@@ -251,18 +247,14 @@ func EclipticEquatorialConverter(coordinates *GeographicCoordinates, eclipticObl
 
 }
 
-/**
- * 黄道坐标 -> 赤道坐标
- * eclipticObliquity: 黄赤交角，比如地球是：23°26′20.512″
- */
+// EclipticToEquatorial 黄道坐标 -> 赤道坐标
+//	eclipticObliquity: 黄赤交角，比如地球是：23°26′20.512″
 func EclipticToEquatorial(coordinates *EclipticCoordinates, eclipticObliquity float64) *EquatorialCoordinates {
 	return EclipticEquatorialConverter(coordinates.AsGeographicCoordinates(), eclipticObliquity).AsEquatorialCoordinates()
 }
 
-/**
- * 赤道坐标 -> 黄道坐标
- * eclipticObliquity: 黄赤交角，比如地球是：23°26′20.512″
- */
+// EquatorialToEcliptic 赤道坐标 -> 黄道坐标
+//	eclipticObliquity: 黄赤交角，比如地球是：23°26′20.512″
 func EquatorialToEcliptic(coordinates *EquatorialCoordinates, eclipticObliquity float64) *EclipticCoordinates {
 	return EclipticEquatorialConverter(coordinates.AsGeographicCoordinates(), -eclipticObliquity).AsEclipticCoordinates()
 }

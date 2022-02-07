@@ -22,9 +22,7 @@ func GetLunarMonthString(index int, leap bool) string {
 	return LunarMonthStrings[index%12]
 }
 
-/**
- * LunarSolarEclipticLongitudeDelta 月亮和太阳的黄经之差
- */
+// LunarSolarEclipticLongitudeDelta 月亮和太阳的黄经之差
 func (astro *Astronomy) LunarSolarEclipticLongitudeDelta(jdET *EphemerisTime) (float64, float64, error) {
 	sun, err := astro.PlanetProperties(swe.Sun, jdET)
 	if err != nil {
@@ -39,12 +37,10 @@ func (astro *Astronomy) LunarSolarEclipticLongitudeDelta(jdET *EphemerisTime) (f
 	return moon.Ecliptic.Longitude - sun.Ecliptic.Longitude, moon.SpeedInLongitude - sun.SpeedInLongitude, nil
 }
 
-/**
- * LunarSolarEclipticLongitudeDeltaToTime 从jdET开始，以月球和太阳的黄经之差求出具体时间，比如 朔（0），上弦（90°），望（180°），下弦（270°）
- * jdET 以此时间开始
- * eclipticLongitudeDelta 弧差
- * precision 是否更加精确的计算，精确计算会比较耗时
- */
+// LunarSolarEclipticLongitudeDeltaToTime 从jdET开始，以月球和太阳的黄经之差求出具体时间，比如 朔（0），上弦（90°），望（180°），下弦（270°）
+//	jdET 以此时间开始
+//	eclipticLongitudeDelta 弧差
+//	precision 是否更加精确的计算，精确计算会比较耗时
 func (astro *Astronomy) LunarSolarEclipticLongitudeDeltaToTime(jdET *EphemerisTime, eclipticLongitudeDelta float64) (JulianDay, int, error) {
 	eclipticLongitudeDelta = math.Abs(eclipticLongitudeDelta)
 
@@ -152,13 +148,10 @@ func (astro *Astronomy) LunarSolarEclipticLongitudeDeltaToTime(jdET *EphemerisTi
 
 }
 
-/**
- * 根据传入的月日黄经差值(数组), 返回对应的时间(数组)
- * startJdUT 起始时间
- * eclipticLongitudeDeltas 月日黄经差值 弧度，
- * 比如(这里以度表示，实际应该是弧度)：{90, 180, 270, 0, 90} 表示startJdUT之后的{上弦，望，下弦，下一个朔，下一个上弦}
- * 也就是说可以计算多个月的，下面的 LunarPhases，使用本函数一次计算了1年
- */
+// LunarSolarEclipticLongitudeDeltaToTimes 根据传入的月日黄经差值(数组), 返回对应的时间(数组)
+//	startJdUT 起始时间
+//	eclipticLongitudeDeltas 月日黄经差值 弧度， 比如(这里以度表示，实际应该传入弧度)：{90, 180, 270, 0, 90} 表示startJdUT之后的{上弦，望，下弦，下一个朔，下一个上弦}
+// 也就是说可以计算多个月的，下面的 LunarPhases，使用本函数一次计算了1年
 func (astro *Astronomy) LunarSolarEclipticLongitudeDeltaToTimes(startJdUT JulianDay, eclipticLongitudeDeltas []float64) ([]JulianDay, error) {
 	times := make([]JulianDay, len(eclipticLongitudeDeltas))
 
@@ -183,11 +176,9 @@ func (astro *Astronomy) LunarSolarEclipticLongitudeDeltaToTimes(startJdUT Julian
 	return times, nil
 }
 
-/**
- * 2时间之间的月相的时间，注意：只会返回如下月相：朔、上弦、望、下弦
- * startJdUT 起始时间
- * startJdUT 结束时间
- */
+// LunarPhasesRange 2时间之间的月相的时间，注意：只会返回如下月相：朔、上弦、望、下弦
+//	startJdUT 起始时间
+//	startJdUT 结束时间
 func (astro *Astronomy) LunarPhasesRange(startJdUT, endJdUT JulianDay) ([]*JulianDayExtra, error) {
 
 	// 90° 每个节气
@@ -231,20 +222,16 @@ func (astro *Astronomy) LunarPhasesRange(startJdUT, endJdUT JulianDay) ([]*Julia
 	return lunarTimes, nil
 }
 
-/**
- * 某年的月相
- * year 年
- */
+// LunarPhases 某年的月相
+//  year 年
 func (astro *Astronomy) LunarPhases(year int) ([]*JulianDayExtra, error) {
 	jd := DateToJulianDay(year, 1, 1, 0, 0, 0)
 	return astro.LunarPhasesRange(jd, jd.AddYears(1))
 }
 
-/**
- * 某时间之后的朔日（数组）
- * startJdUT 起始时间
- * count 计算多少个朔日
- */
+// NextNewMoons 某时间之后的朔日（数组）
+//	startJdUT 起始时间
+//	count 计算多少个朔日
 func (astro *Astronomy) NextNewMoons(startJdUT JulianDay, count int) ([]JulianDay, error) {
 
 	eclipticLongitudeDeltas := make([]float64, count)
@@ -260,10 +247,8 @@ func (astro *Astronomy) NextNewMoons(startJdUT JulianDay, count int) ([]JulianDa
 	return times, nil
 }
 
-/**
- * 某时间之前的第一个朔日
- * startJdUT 起始时间
- */
+// LastNewMoons 某时间之前的第一个朔日
+//	startJdUT 起始时间
 func (astro *Astronomy) LastNewMoons(startJdUT JulianDay) (JulianDay, error) {
 	times, err := astro.NextNewMoons(startJdUT-MeanLunarDays*1.5, 3)
 	if err != nil {

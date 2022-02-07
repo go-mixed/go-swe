@@ -11,9 +11,7 @@ func IfThenElse(condition bool, a interface{}, b interface{}) interface{} {
 	return b
 }
 
-/**
- * 1m 的物体影子长度
- */
+// ShadowLength 1m 的物体影子长度
 func ShadowLength(altitude float64) float64 {
 	//tan(90) 错误,大于90度也无效
 	if altitude <= 0 || altitude > Radian90 {
@@ -31,24 +29,24 @@ func ShadowLength(altitude float64) float64 {
 	return math.Tan(Radian90 - altitude)
 }
 
-// 大气折射修正
-// ho: 视高度
+// AstronomicalRefraction 大气折射修正
+//	ho: 视高度
 func AstronomicalRefraction(ho float64) float64 {
 	return -0.0002909 / math.Tan(ho+0.002227/(ho+0.07679))
 }
 
-// 大气折射修正
-// h: 真高度
+// AstronomicalRefraction2 大气折射修正
+//	h: 真高度
 func AstronomicalRefraction2(h float64) float64 {
 	return 0.0002967 / math.Tan(h+0.003138/(h+0.08919))
 }
 
-// 视差修正
-// equator: 赤道坐标
-// distance: 距离，以AU为单位
-// hourAngle: 时角
-// latitude: 观察者纬度
-// height: 观察者海拔
+// Parallax 视差修正
+//	equator: 赤道坐标
+//	distance: 距离，以AU为单位
+//	hourAngle: 时角
+//	latitude: 观察者纬度
+//	height: 观察者海拔
 func Parallax(equatorial EquatorialCoordinates, distance, hourAngle, latitude, height float64) *GeographicCoordinates {
 	//赤道地平视差
 	sinP := 8.794 / DegreeSecondsPerRadian / distance

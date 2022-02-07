@@ -10,12 +10,10 @@ var SolarTermsString = [...]string{
 	"春分", "清明", "谷雨", "立夏", "小满", "芒种", "夏至", "小暑", "大暑", "立秋", "处暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪", "冬至", "小寒", "大寒", "立春", "雨水", "惊蛰",
 }
 
-/**
- * 指定太阳黄经, 反推出当时的时间
- * startJdET 时间起点jdET
- * startPlanet 该起点的天体属性
- * eclipticLongitude 目标黄经
- */
+// 指定太阳黄经, 反推出当时的时间
+//	startJdET 时间起点jdET
+//	startPlanet 该起点的天体属性
+//	eclipticLongitude 目标黄经
 func calcJulianDayBySolarEclipticLongitude(
 	astro *Astronomy,
 	startJdET *EphemerisTime,
@@ -56,11 +54,9 @@ func calcJulianDayBySolarEclipticLongitude(
 
 }
 
-/**
- * 指定太阳黄经, 反推出当时的时间
- * startJdUT 时间起始
- * eclipticLongitude 黄经弧度
- */
+// SolarEclipticLongitudesToTime 指定太阳黄经, 反推出当时的时间
+//	startJdUT 时间起始
+//	eclipticLongitude 黄经弧度
 func (astro *Astronomy) SolarEclipticLongitudesToTime(startJdUT JulianDay, eclipticLongitude float64) (JulianDay, int, error) {
 	jdET := NewEphemerisTime(startJdUT)
 
@@ -77,12 +73,10 @@ func (astro *Astronomy) SolarEclipticLongitudesToTime(startJdUT JulianDay, eclip
 	return jd, calcCount, nil
 }
 
-/**
- * 指定太阳黄经(数组), 反推出当时的时间(数组)
- * startJd 时间起始
- * eclipticLongitudes 黄经弧度数组
- * 比如(这里以度表示，实际应该是弧度)：{270, 0, 270}，表示startJdUT之后的{冬至, 春分，下一个冬至}
- */
+// SolarEclipticLongitudesToTimes 指定太阳黄经(数组), 反推出当时的时间(数组)
+//	startJd 时间起始
+//	eclipticLongitudes 黄经弧度数组
+// 比如(这里以度表示，实际应该是弧度)：{270, 0, 270}，表示startJdUT之后的{冬至, 春分，下一个冬至}
 func (astro *Astronomy) SolarEclipticLongitudesToTimes(startJdUT JulianDay, eclipticLongitudes []float64) ([]JulianDay, error) {
 
 	times := make([]JulianDay, len(eclipticLongitudes))
@@ -114,11 +108,9 @@ func (astro *Astronomy) SolarEclipticLongitudesToTimes(startJdUT JulianDay, ecli
 	return times, nil
 }
 
-/**
- * 2时间之间的所有节气
- * startJdUT 起始时间
- * endJdUT 结束时间
- */
+// SolarTermsRange 2时间之间的所有节气
+//	startJdUT 起始时间
+//	endJdUT 结束时间
 func (astro *Astronomy) SolarTermsRange(startJdUT, endJdUT JulianDay) ([]*JulianDayExtra, error) {
 	// 15° 每个节气
 	const degreePerSolarTerm = 15.
@@ -154,10 +146,8 @@ func (astro *Astronomy) SolarTermsRange(startJdUT, endJdUT JulianDay) ([]*Julian
 	return solarTerms, nil
 }
 
-/**
- * 该年的24节气的时间
- * year 年
- */
+// SolarTerms 该年的24节气的时间, 万年历主入口
+//	year 年
 func (astro *Astronomy) SolarTerms(year int) ([]*JulianDayExtra, error) {
 	jd := DateToJulianDay(year, 1, 1, 0, 0, 0)
 	return astro.SolarTermsRange(jd, jd.AddYears(1))

@@ -69,7 +69,7 @@ type PlanetProperties struct {
 	Horizontal *HorizontalCoordinates `json:"horizontal"`
 }
 
-// 返回千米为单位的距离
+// DistanceAsKilometer 返回千米为单位的距离
 func (p *PlanetProperties) DistanceAsKilometer() float64 {
 	return p.Distance * AU
 }
@@ -98,9 +98,7 @@ func (astro *Astronomy) simpleCalcFlags(deltaT float64) *swe.CalcFlags {
 	}
 }
 
-/**
- * 黄道属性，包含倾角、章动
- */
+// EclipticProperties 黄道属性，包含倾角、章动
 func (astro *Astronomy) EclipticProperties(jdET *EphemerisTime) (*EclipticProperties, error) {
 
 	// 黄道章动
@@ -118,9 +116,7 @@ func (astro *Astronomy) EclipticProperties(jdET *EphemerisTime) (*EclipticProper
 	}, nil
 }
 
-/**
- * 天体属性，包括黄道经纬，距离，黄道经纬速度，距离速度
- */
+// PlanetProperties 天体属性，包括黄道经纬，距离，黄道经纬速度，距离速度
 func (astro *Astronomy) PlanetProperties(planetId swe.Planet, jdET *EphemerisTime) (*PlanetProperties, error) {
 	// 天体的基本属性：黄道坐标、距离等参数
 	res, _, err := astro.Swe.Calc(jdET.Value(), planetId, astro.simpleCalcFlags(jdET.DeltaT))
@@ -142,11 +138,10 @@ func (astro *Astronomy) PlanetProperties(planetId swe.Planet, jdET *EphemerisTim
 	}, nil
 }
 
-/**
- * 返回天体的所有属性，除了基本属性外，还包含时角、赤道坐标、地平坐标
- * 关于HA的计算，因为章动同时影响恒星时和赤道坐标，所以不计算章动。
- * withRevise 是否修正，包含使用真黄道倾角、修正大气折射、修正地平坐标中视差
- */
+// PlanetPropertiesWithObserver 返回天体的所有属性，除了基本属性外，还包含时角、赤道坐标、地平坐标
+//
+// 关于HA的计算，因为章动同时影响恒星时和赤道坐标，所以不计算章动。
+//	withRevise 是否修正，包含使用真黄道倾角、修正大气折射、修正地平坐标中视差
 func (astro *Astronomy) PlanetPropertiesWithObserver(
 	planetId swe.Planet,
 	jdET *EphemerisTime,

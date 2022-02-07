@@ -4,22 +4,20 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3347a993-022c-48ee-876f-5b1cd855ff3c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/go-swe.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/go-swe.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="3347a993-022c-48ee-876f-5b1cd855ff3c" name="Changes" comment="upgrade">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/astro/astronomy.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/astronomy.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/astro/calendar.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/calendar.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/astro/time.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/time.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/astro/common.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/common.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/astro/coordinates.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/coordinates.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/astro/lunar.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/lunar.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/astro/math.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/math.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/astro/solar.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/solar.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/astro/twilight.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/astro/twilight.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/web/controllers/jd.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/web/controllers/jd.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/web/controllers/lunar.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/web/controllers/lunar.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/web/controllers/solar.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/web/controllers/solar.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/web/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/web/routes.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,6 +96,21 @@
     </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="upgrade" />
+    <option name="LAST_COMMIT_MESSAGE" value="upgrade" />
+  </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
   </component>
