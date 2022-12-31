@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"github.com/spf13/cobra"
-	web2 "go-common-web"
-	"go-common/task_pool"
-	"go-common/utils/io"
-	"go-swe/src/web"
+	innerWeb "go-swe/src/web"
+	"go.uber.org/zap"
+	"gopkg.in/go-mixed/go-common.v1/logger.v1"
+	"gopkg.in/go-mixed/go-common.v1/task_pool"
+	"gopkg.in/go-mixed/go-common.v1/utils/io"
+	"gopkg.in/go-mixed/go-common.v1/web.v1"
 
 	"fmt"
-	"go-common/utils"
 	"go-swe/src/astro"
 	conf "go-swe/src/settings"
 	"path/filepath"
@@ -31,7 +32,7 @@ func main() {
 	}
 
 	// 读取CLI
-	rootCmd.PersistentFlags().StringP("config", "c", filepath.Join(currentDir, "conf/settings.json"), "config file")
+	rootCmd.PersistentFlags().StringP("config", "c", filepath.Join(currentDir, "conf/settings.yml"), "config file")
 	rootCmd.PersistentFlags().StringP("log", "l", filepath.Join(currentDir, "logs"), "log files path")
 	err := rootCmd.Execute()
 	if err != nil {
@@ -50,28 +51,29 @@ func run(_configFile, _logPath string) {
 	}
 
 	// 初始化日志
-	utils.InitLogger(filepath.Join(_logPath, "app.log"), "")
-	logger := utils.GetSugaredLogger()
-
-	exec, _ := task_pool.NewExecutor(task_pool.DefaultExecutorParams(), logger)
+	l, err := logger.InitLogger(filepath.Join(_logPath, "app.log"), "")
+	if err != nil {
+		panic(err)
+	}
+	exec, _ := task_pool.NewExecutor(task_pool.DefaultExecutorParams(), l.Sugar())
 	defer exec.Stop()
 	exec.ListenStopSignal()
 
 	exec.Submit(func(ctx context.Context) {
-		engine := web2.NewGinEngine(web2.DefaultGinOptions(settings.Debug, true))
-		web.RegisterRouter(engine)
-		server := web2.NewHttpServer(web2.DefaultServerOptions(settings.Host))
-		if err := server.SetDefaultServeHandler(engine, web2.NewCertificate(settings.Cert, settings.Key)); err != nil {
-			logger.Error(err.Error())
+		engine := web.NewGinEngine(web.DefaultGinOptions(settings.Debug, true), l.ZapLogger())
+		innerWeb.RegisterRouter(engine)
+		server := web.NewHttpServer(web.DefaultServerOptions(settings.Host))
+		if err := server.SetDefaultServeHandler(engine, web.NewCertificate(settings.Cert, settings.Key)); err != nil {
+			l.Error("", zap.Error(err))
 			return
 		}
 		if err := server.Run(ctx, nil); err != nil {
-			logger.Error(err.Error())
+			l.Error("", zap.Error(err))
 		}
 	})
 
 	exec.Wait()
-	logger.Info("main application exit.")
+	l.Info("main application exit.")
 
 	t := time.Now().UnixNano()
 

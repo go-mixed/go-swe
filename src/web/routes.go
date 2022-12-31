@@ -2,8 +2,8 @@ package web
 
 import (
 	"github.com/gin-gonic/gin"
-	"go-common-web/controllers"
-	controllers2 "go-swe/src/web/controllers"
+	innerControllers "go-swe/src/web/controllers"
+	"gopkg.in/go-mixed/go-common.v1/web.v1/controllers"
 )
 
 func RegisterRouter(r *gin.Engine) {
@@ -27,14 +27,14 @@ func RegisterRouter(r *gin.Engine) {
 
 func RegisterControllers() {
 	controllers.RegisterController("SolarController", func(ctx *gin.Context) controllers.IController {
-		return &controllers2.SolarController{Controller: controllers.Controller{Context: ctx}}
+		return &innerControllers.SolarController{Controller: controllers.Controller{Context: ctx}}
 	})
 
 	controllers.RegisterController("JDController", func(ctx *gin.Context) controllers.IController {
-		return &controllers2.JDController{Controller: controllers.Controller{Context: ctx}}
+		return &innerControllers.JDController{Controller: controllers.Controller{Context: ctx}}
 	})
 
 	controllers.RegisterController("LunarController", func(ctx *gin.Context) controllers.IController {
-		return &controllers2.LunarController{Controller: controllers.Controller{Context: ctx}}
+		return &innerControllers.LunarController{Controller: controllers.Controller{Context: ctx}}
 	})
 }

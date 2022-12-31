@@ -3,8 +3,8 @@ package controllers
 import (
 	"github.com/araddon/dateparse"
 	"github.com/gin-gonic/gin"
-	"go-common-web/controllers"
 	"go-swe/src/astro"
+	"gopkg.in/go-mixed/go-common.v1/web.v1/controllers"
 	"time"
 )
 

@@ -1,12 +1,12 @@
 package settings
 
-import "go-common/utils"
+import "gopkg.in/go-mixed/go-common.v1/conf.v1"
 
 type Settings struct {
-	Debug bool   `json:"debug"`
-	Host  string `json:"host"`
-	Cert  string `json:"cert"`
-	Key   string `json:"key"`
+	Debug bool   `yaml:"debug"`
+	Host  string `yaml:"host"`
+	Cert  string `yaml:"cert"`
+	Key   string `yaml:"key"`
 }
 
 func LoadSettings(filename string) (*Settings, error) {
@@ -17,7 +17,7 @@ func LoadSettings(filename string) (*Settings, error) {
 		Key:   "",
 	}
 
-	if err := utils.LoadSettings(settings, filename); err != nil {
+	if err := conf.LoadSettings(settings, filename); err != nil {
 		return nil, err
 	}
 

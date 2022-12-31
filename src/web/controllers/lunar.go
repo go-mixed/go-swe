@@ -3,10 +3,10 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"go-common-cache"
-	"go-common-web/controllers"
-	"go-common/utils/conv"
 	"go-swe/src/astro"
+	"gopkg.in/go-mixed/go-common.v1/cache.v1"
+	"gopkg.in/go-mixed/go-common.v1/utils/conv"
+	"gopkg.in/go-mixed/go-common.v1/web.v1/controllers"
 	"time"
 )
 
